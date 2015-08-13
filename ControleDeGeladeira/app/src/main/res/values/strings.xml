@@ -4,4 +4,8 @@
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="titutoApp">Lista de Alimentos</string>
+    <string name="nome">Nome: </string>
+    <string name="quantidadeAlimento">Quantidade: </string>
+    <string name="btnSalvar">Salvar</string>
+    <string name="cadastro">Cadastro</string>
 </resources>
