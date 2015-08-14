@@ -103,7 +103,7 @@
                             android:id="@+id/txtViewNome" />
 
                         <EditText
-                            android:id="@+id/nome"
+                            android:id="@+id/idNome"
                             android:layout_width="fill_parent"
                             android:layout_height="wrap_content"
                             android:inputType="text" />
@@ -124,7 +124,7 @@
                     </LinearLayout>
 
                     <Button
-                        android:id="@+id/salvar"
+                        android:id="@+id/idBtnSalvar"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
