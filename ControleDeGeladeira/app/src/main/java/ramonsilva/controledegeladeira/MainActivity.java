@@ -1,20 +1,17 @@
 package ramonsilva.controledegeladeira;
 
-import android.app.ActionBar;
 import android.app.Activity;
-import android.app.ListActivity;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TabHost;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,17 +20,67 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private List<Alimentos> alimentos = new ArrayList<Alimentos>();
     private  AlimentoAdapter adapter = null;
-
+    private Alimentos alimentoSelecionado = null;
+    private int qnt = 0;
+    private int posicaoDoALimento = 0;
+    private Button botaoMenos = null;
+    private Button botaoExcluir = null;
+    private Button botaoMais = null;
+    private String nomeAlimento = null;
+    private String qntAlimento = null;
     @Override
     public void onClick(View v) {
-        Alimentos alimento = new Alimentos();
-        EditText nome = (EditText)findViewById(R.id.idNome);
-        EditText quantidade = (EditText)findViewById(R.id.idQuantidade);
-        alimento.setNome(nome.getText().toString());
-        alimento.setQuantidade(quantidade.getText().toString());
-        adapter.add(alimento);
-        nome.setText("");
-        quantidade.setText("");
+        switch(v.getId())
+        {
+            case R.id.idBtnSalvar:
+
+                Alimentos alimento = new Alimentos();
+                EditText nome = (EditText)findViewById(R.id.idNome);
+                EditText quantidade = (EditText)findViewById(R.id.idQuantidade);
+                nomeAlimento = nome.getText().toString();
+                qntAlimento = quantidade.getText().toString();
+                if(!nomeAlimento.isEmpty() && !qntAlimento.isEmpty()) {
+                    alimento.setNome(nomeAlimento);
+                    alimento.setQuantidade(qntAlimento);
+                    adapter.add(alimento);
+                    nome.setText("");
+                    quantidade.setText("");
+                }
+
+                break;
+
+            case R.id.idBtnMinus:
+
+                qnt = 0;
+                qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
+                if(qnt >= 0) {
+                    adapter.remove(alimentoSelecionado);
+                    alimentoSelecionado.setQuantidade(String.valueOf(qnt - 1));
+                    adapter.insert(alimentoSelecionado, posicaoDoALimento);
+                }
+                break;
+
+            case R.id.idBtnPlus:
+
+                qnt = 0;
+                qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
+                if(qnt >= 0) {
+                    adapter.remove(alimentoSelecionado);
+                    alimentoSelecionado.setQuantidade(String.valueOf(qnt + 1));
+                    adapter.insert(alimentoSelecionado, posicaoDoALimento);
+
+                }
+                break;
+
+            case R.id.idBtnExclude:
+
+               adapter.remove(alimentoSelecionado);
+               break;
+
+            default:
+                break;
+        }
+
     }
 
     private class AlimentoAdapter extends ArrayAdapter{
@@ -59,12 +106,34 @@ public class MainActivity extends Activity implements View.OnClickListener{
         descritor.setIndicator(getString(R.string.cadastro));
         tab.addTab(descritor);
 
-        Button salvar = (Button) findViewById(R.id.idBtnSalvar);
-        salvar.setOnClickListener(this);
-
         ListView lista = (ListView)findViewById(R.id.idListViewAlimentos);
+        lista.setSelector(R.drawable.selected);
         adapter = new AlimentoAdapter();
         lista.setAdapter(adapter);
+
+        lista.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                posicaoDoALimento = position;
+                alimentoSelecionado = (Alimentos)parent.getItemAtPosition(posicaoDoALimento);
+
+            }
+        });
+
+
+
+        Button salvar = (Button) findViewById(R.id.idBtnSalvar);
+        salvar.setOnClickListener(this);
+        botaoMenos = (Button)findViewById(R.id.idBtnMinus);
+        botaoMenos.setOnClickListener(this);
+
+        botaoMais = (Button)findViewById(R.id.idBtnPlus);
+        botaoMais.setOnClickListener(this);
+
+        botaoExcluir = (Button)findViewById(R.id.idBtnExclude);
+        botaoExcluir.setOnClickListener(this);
+
 
 
     }

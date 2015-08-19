@@ -3,66 +3,6 @@
         android:layout_height="match_parent"
         android:id="@+id/tabHost">
 
-        <!--<LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
-
-            <TabWidget
-                android:id="@+id/tabs"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"/>
-            <FrameLayout
-                android:id="@+id/tabcontent"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent">
-
-                <ListView
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:id="@+id/idListViewAlimentos" />
-
-                <RelativeLayout
-                    android:id="@+id/Cadastro"
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content">
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentTop="true"
-                        android:orientation="vertical">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/nome"/>
-                        <EditText
-                            android:id="@+id/nomeAlimento"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content" />
-                        <TextView
-                            android:id="@+id/quantidade"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/quantidadeAlimento"/>
-
-                        <EditText
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:inputType="numberDecimal"
-                            android:ems="10"
-                            android:id="@+id/quantidadeAliment"
-                            android:layout_gravity="center_horizontal" />
-                    </LinearLayout>
-                    <Button
-                        android:id="@+id/btnSalvar"
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:text="@string/btnSalvar"/>
-                </RelativeLayout>
-            </FrameLayout>
-        </LinearLayout>
--->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -78,10 +18,61 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" >
 
-                <ListView
-                    android:id="@+id/idListViewAlimentos"
+                <RelativeLayout
                     android:layout_width="match_parent"
-                    android:layout_height="match_parent" />
+                    android:layout_height="match_parent"
+                    android:id="@+id/idRelLayLista">
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:background="?android:attr/activatedBackgroundIndicator">
+
+                        <ListView
+                            android:id="@+id/idListViewAlimentos"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:choiceMode="singleChoice"
+                            android:listSelector="@drawable/selected"
+                            android:clickable="true"
+                            />
+
+                    </LinearLayout>
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txtBtnMinus"
+                        android:id="@+id/idBtnMinus"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toLeftOf="@+id/idBtnExclude"
+                        android:layout_toStartOf="@+id/idBtnExclude"
+                        android:visibility="visible" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txtBtnExclude"
+                        android:id="@+id/idBtnExclude"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        android:visibility="visible" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/txtBtnPlus"
+                        android:id="@+id/idBtnPlus"
+                        android:layout_alignParentBottom="true"
+                        android:layout_toRightOf="@+id/idBtnExclude"
+                        android:layout_toEndOf="@+id/idBtnExclude"
+                        android:visibility="visible" />
+                </RelativeLayout>
+
 
                 <RelativeLayout
                     android:id="@+id/Cadastro"
@@ -130,7 +121,32 @@
                         android:layout_alignParentBottom="true"
                         android:text="@string/btnSalvar" />
                 </RelativeLayout>
+                <!--
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtBtnMinus"
+                    android:id="@+id/idBtnMinus"
+                    android:layout_gravity="left|bottom" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtBtnExclude"
+                    android:id="@+id/idBtnExcluir"
+                    android:layout_gravity="center_horizontal|bottom" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/txtBtnPlus"
+                    android:id="@+id/idBtnPlus"
+                    android:layout_gravity="right|bottom" />
+                    -->
             </FrameLayout>
+
+
         </LinearLayout>
 
     </TabHost>

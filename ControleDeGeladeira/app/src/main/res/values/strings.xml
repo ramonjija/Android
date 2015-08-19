@@ -8,4 +8,7 @@
     <string name="quantidadeAlimento">Quantidade: </string>
     <string name="btnSalvar">Salvar</string>
     <string name="cadastro">Cadastro</string>
+    <string name="txtBtnPlus">+</string>
+    <string name="txtBtnExclude">Excluir</string>
+    <string name="txtBtnMinus">-</string>
 </resources>
