@@ -1,6 +1,7 @@
 package ramonsilva.controledegeladeira;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -12,6 +13,10 @@ import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.TabHost;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +24,7 @@ import java.util.List;
 public class MainActivity extends Activity implements View.OnClickListener{
 
     private List<Alimentos> alimentos = new ArrayList<Alimentos>();
-    private  AlimentoAdapter adapter = null;
+    private AlimentoAdapter adapter = null;
     private Alimentos alimentoSelecionado = null;
     private int qnt = 0;
     private int posicaoDoALimento = 0;
@@ -106,6 +111,28 @@ public class MainActivity extends Activity implements View.OnClickListener{
         descritor.setIndicator(getString(R.string.cadastro));
         tab.addTab(descritor);
 
+
+        SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+
+        try {
+            JSONArray array = new JSONArray(mPrefs.getString("alimentos","alimentos"));
+            JSONObject obj;
+            Alimentos alimento;
+            for(int i =0; i<array.length(); i++){
+                obj = array.getJSONObject(i);
+                alimento = new Alimentos();
+                alimento.setNome(obj.getString("nome"));
+                alimento.setQuantidade(obj.getString("quantidade"));
+
+                alimentos.add(alimento);
+
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
         ListView lista = (ListView)findViewById(R.id.idListViewAlimentos);
         lista.setSelector(R.drawable.selected);
         adapter = new AlimentoAdapter();
@@ -162,4 +189,31 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         return super.onOptionsItemSelected(item);
     }
+
+    @Override
+    protected void onPause() {
+        if(!adapter.isEmpty()){
+            SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = mPrefs.edit();
+            JSONArray array = new JSONArray();
+            JSONObject obj;
+
+            for(Alimentos item : alimentos){
+                obj = new JSONObject();
+                try {
+                    obj.put("nome", item.getNome());
+                    obj.put("quantidade", item.getQuantidade());
+
+                    array.put(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            String arrayStr = array.toString();
+            prefsEditor.putString("alimentos", arrayStr).commit();
+        }
+        super.onPause();
+    }
 }
+
+
