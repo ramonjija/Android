@@ -27,16 +27,17 @@
                         android:orientation="vertical"
                         android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:background="?android:attr/activatedBackgroundIndicator">
+                        android:background="?android:attr/activatedBackgroundIndicator"
+                        android:weightSum="1"
+                        android:layout_above="@+id/idBtnSalvarLista">
 
                         <ListView
                             android:id="@+id/idListViewAlimentos"
                             android:layout_width="match_parent"
-                            android:layout_height="match_parent"
+                            android:layout_height="271dp"
                             android:choiceMode="singleChoice"
                             android:listSelector="@drawable/selected"
-                            android:clickable="true"
-                            />
+                            android:clickable="true" />
 
                     </LinearLayout>
 
@@ -65,12 +66,30 @@
                         style="?android:attr/buttonStyleSmall"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:text="@string/btnSalvar"
+                        android:id="@+id/idBtnSalvarLista"
+                        android:layout_alignParentTop="false"
+                        android:visibility="visible"
+
+                        android:layout_gravity="center_horizontal"
+                        android:layout_alignParentBottom="false"
+                        android:layout_alignParentLeft="false"
+                        android:layout_alignParentRight="false"
+                        android:layout_alignWithParentIfMissing="false"
+                        android:layout_centerHorizontal="true"
+                        android:layout_above="@+id/idBtnExclude" />
+
+                    <Button
+                        style="?android:attr/buttonStyleSmall"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
                         android:text="@string/txtBtnPlus"
                         android:id="@+id/idBtnPlus"
                         android:layout_alignParentBottom="true"
                         android:layout_toRightOf="@+id/idBtnExclude"
                         android:layout_toEndOf="@+id/idBtnExclude"
                         android:visibility="visible" />
+
                 </RelativeLayout>
 
 

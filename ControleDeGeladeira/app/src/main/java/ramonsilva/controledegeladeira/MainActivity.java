@@ -2,6 +2,7 @@ package ramonsilva.controledegeladeira;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -11,6 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 
 import org.json.JSONArray;
@@ -28,11 +30,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Alimentos alimentoSelecionado = null;
     private int qnt = 0;
     private int posicaoDoALimento = 0;
+    private Alimentos AlimentoAnterior = null;
+    private AdapterView adaptadorPai = null;
+    private View viewAl = null;
     private Button botaoMenos = null;
     private Button botaoExcluir = null;
     private Button botaoMais = null;
     private String nomeAlimento = null;
     private String qntAlimento = null;
+    private Button botaoSalvarLista = null;
     @Override
     public void onClick(View v) {
         switch(v.getId())
@@ -54,37 +60,76 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                 break;
 
+            case R.id.idBtnSalvarLista:
+
+                salvarLista();
+
+                break;
+
             case R.id.idBtnMinus:
 
-                qnt = 0;
-                qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
-                if(qnt >= 0) {
-                    adapter.remove(alimentoSelecionado);
-                    alimentoSelecionado.setQuantidade(String.valueOf(qnt - 1));
-                    adapter.insert(alimentoSelecionado, posicaoDoALimento);
+                if(alimentoSelecionado != null)
+                {
+
+                    qnt = 0;
+                    qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
+                    if (qnt > 0) {
+                        adapter.remove(alimentoSelecionado);
+                        alimentoSelecionado.setQuantidade(String.valueOf(qnt - 1));
+                        adapter.insert(alimentoSelecionado, posicaoDoALimento);
+                    }
                 }
                 break;
 
             case R.id.idBtnPlus:
+                if(alimentoSelecionado != null)
+                {
+                    qnt = 0;
+                    qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
+                    if (qnt >= 0) {
+                        adapter.remove(alimentoSelecionado);
+                        alimentoSelecionado.setQuantidade(String.valueOf(qnt + 1));
+                        adapter.insert(alimentoSelecionado, posicaoDoALimento);
 
-                qnt = 0;
-                qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
-                if(qnt >= 0) {
-                    adapter.remove(alimentoSelecionado);
-                    alimentoSelecionado.setQuantidade(String.valueOf(qnt + 1));
-                    adapter.insert(alimentoSelecionado, posicaoDoALimento);
-
+                    }
                 }
                 break;
 
             case R.id.idBtnExclude:
+                if(alimentoSelecionado != null)
+                {
 
-               adapter.remove(alimentoSelecionado);
+                    adapter.remove(alimentoSelecionado);
+                    alimentoSelecionado = null;
+                }
                break;
 
             default:
                 break;
         }
+
+    }
+
+    protected void salvarLista(){
+
+            SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = mPrefs.edit();
+            JSONArray array = new JSONArray();
+            JSONObject obj;
+
+            for(Alimentos item : alimentos){
+                obj = new JSONObject();
+                try {
+                    obj.put("nome", item.getNome());
+                    obj.put("quantidade", item.getQuantidade());
+
+                    array.put(obj);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+            String arrayStr = array.toString();
+            prefsEditor.putString("alimentos", arrayStr).commit();
 
     }
 
@@ -110,7 +155,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         descritor.setContent(R.id.Cadastro);
         descritor.setIndicator(getString(R.string.cadastro));
         tab.addTab(descritor);
-
 
         SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
 
@@ -138,14 +182,18 @@ public class MainActivity extends Activity implements View.OnClickListener{
         adapter = new AlimentoAdapter();
         lista.setAdapter(adapter);
 
-        lista.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 posicaoDoALimento = position;
-                alimentoSelecionado = (Alimentos)parent.getItemAtPosition(posicaoDoALimento);
+                adaptadorPai = parent;
+                viewAl = view;
+                alimentoSelecionado = (Alimentos) parent.getItemAtPosition(posicaoDoALimento);
+
 
             }
+
         });
 
 
@@ -160,6 +208,33 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         botaoExcluir = (Button)findViewById(R.id.idBtnExclude);
         botaoExcluir.setOnClickListener(this);
+
+        botaoSalvarLista = (Button)findViewById(R.id.idBtnSalvarLista);
+        botaoSalvarLista.setOnClickListener(this);
+
+        tab.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+                                        @Override
+                                        public void onTabChanged(String tabId) {
+                                            if(tabId.equals("aba2"))
+                                            {
+                                                botaoMais.setVisibility(View.INVISIBLE);
+                                                botaoMenos.setVisibility(View.INVISIBLE);
+                                                botaoExcluir.setVisibility(View.INVISIBLE);
+                                                botaoSalvarLista.setVisibility(View.INVISIBLE);
+                                            }
+                                            else
+                                            {
+                                                botaoMais.setVisibility(View.VISIBLE);
+                                                botaoMenos.setVisibility(View.VISIBLE);
+                                                botaoExcluir.setVisibility(View.VISIBLE);
+                                                botaoSalvarLista.setVisibility(View.VISIBLE);
+                                            }
+                                        }
+                                    }
+
+
+        );
+
 
 
 
@@ -192,26 +267,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     @Override
     protected void onPause() {
-        if(!adapter.isEmpty()){
-            SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
-            SharedPreferences.Editor prefsEditor = mPrefs.edit();
-            JSONArray array = new JSONArray();
-            JSONObject obj;
-
-            for(Alimentos item : alimentos){
-                obj = new JSONObject();
-                try {
-                    obj.put("nome", item.getNome());
-                    obj.put("quantidade", item.getQuantidade());
-
-                    array.put(obj);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-            String arrayStr = array.toString();
-            prefsEditor.putString("alimentos", arrayStr).commit();
-        }
+        salvarLista();
         super.onPause();
     }
 }
