@@ -1,0 +1,6 @@
+c:\users\ramon.silva\documents\visual studio 2015\Projects\servicoEnviaLista\servicoEnviaLista\bin\servicoEnviaLista.dll.config
+c:\users\ramon.silva\documents\visual studio 2015\Projects\servicoEnviaLista\servicoEnviaLista\bin\servicoEnviaLista.dll
+c:\users\ramon.silva\documents\visual studio 2015\Projects\servicoEnviaLista\servicoEnviaLista\bin\servicoEnviaLista.pdb
+c:\users\ramon.silva\documents\visual studio 2015\Projects\servicoEnviaLista\servicoEnviaLista\obj\Debug\servicoEnviaLista.csprojResolveAssemblyReference.cache
+c:\users\ramon.silva\documents\visual studio 2015\Projects\servicoEnviaLista\servicoEnviaLista\obj\Debug\servicoEnviaLista.dll
+c:\users\ramon.silva\documents\visual studio 2015\Projects\servicoEnviaLista\servicoEnviaLista\obj\Debug\servicoEnviaLista.pdb

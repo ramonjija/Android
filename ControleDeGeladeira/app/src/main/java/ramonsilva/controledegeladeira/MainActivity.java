@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.support.v7.internal.view.menu.MenuView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -33,6 +34,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private Alimentos AlimentoAnterior = null;
     private AdapterView adaptadorPai = null;
     private View viewAl = null;
+    private ListView lista = null;
     private Button botaoMenos = null;
     private Button botaoExcluir = null;
     private Button botaoMais = null;
@@ -98,9 +100,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
             case R.id.idBtnExclude:
                 if(alimentoSelecionado != null)
                 {
-
                     adapter.remove(alimentoSelecionado);
                     alimentoSelecionado = null;
+
+
                 }
                break;
 
@@ -177,10 +180,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
 
-        ListView lista = (ListView)findViewById(R.id.idListViewAlimentos);
+        lista = (ListView)findViewById(R.id.idListViewAlimentos);
         lista.setSelector(R.drawable.selected);
         adapter = new AlimentoAdapter();
         lista.setAdapter(adapter);
+
+        MenuView.ItemView itemLista = (MenuView.ItemView)lista.getItemAtPosition(lista.getLastVisiblePosition()-1);
 
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
