@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/ControleDeGeladeira.iml" filepath="$PROJECT_DIR$/ControleDeGeladeira.iml" />
+      <module fileurl="file://$PROJECT_DIR$/GCM/GCM.iml" filepath="$PROJECT_DIR$/GCM/GCM.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

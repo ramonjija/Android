@@ -37,7 +37,8 @@
                             android:layout_height="271dp"
                             android:choiceMode="singleChoice"
                             android:listSelector="@drawable/selected"
-                            android:clickable="true" />
+                            android:clickable="true"
+                            android:layout_weight="0.56" />
 
                     </LinearLayout>
 
@@ -133,12 +134,64 @@
 
                     </LinearLayout>
 
+
                     <Button
                         android:id="@+id/idBtnSalvar"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
                         android:text="@string/btnSalvar" />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:id="@+id/idRelLayUsuarios"
+                    >
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <ListView
+                            android:layout_width="match_parent"
+                            android:layout_height="271dp"
+                            android:id="@+id/idListViewAmigos"
+                            android:listSelector="@drawable/selected"
+                            android:layout_weight="0.56"
+                            android:clickable="true"
+                            android:choiceMode="singleChoice" />
+                    </LinearLayout>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/idTxtViewGCM" />
+
+                    <Button
+                        android:id="@+id/idBtnObterGCM"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="@string/obterGcm"
+                        android:visibility="invisible"/>
+
+                    <Button
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/cadastro"
+                        android:id="@+id/idBtnCadastroUsuario"
+
+                        android:layout_alignParentTop="false"
+                        android:layout_gravity="center_horizontal"
+                        android:layout_alignParentBottom="false"
+                        android:layout_alignParentLeft="false"
+                        android:layout_alignParentRight="false"
+                        android:layout_alignWithParentIfMissing="false"
+                        android:layout_centerHorizontal="true"
+                        android:layout_above="@+id/idBtnObterGCM"
+                        android:visibility="invisible"/>
                 </RelativeLayout>
                 <!--
                 <Button
