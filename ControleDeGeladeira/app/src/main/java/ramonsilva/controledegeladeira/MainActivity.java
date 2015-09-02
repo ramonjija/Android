@@ -21,7 +21,7 @@ import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+//import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,7 +29,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import com.parse.Parse;
+import com.parse.ParseObject;
 
 
 public class MainActivity extends Activity implements View.OnClickListener{
@@ -52,7 +53,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button botaosalvarAlimento = null;
 
-    private GoogleCloudMessaging gcm = null;
+    //private GoogleCloudMessaging gcm = null;
     private String regid = null;
     private String PROJECT_NUMBER = "560915181661";
     private Button botaoObterGcm = null;
@@ -102,8 +103,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
                break;
 
             case R.id.idBtnObterGCM:
-                txtViewGcm = (TextView)findViewById(R.id.idTxtViewGCM);
-                utilidadesGcm.ObtemId(PROJECT_NUMBER, contexto, gcm, txtViewGcm);
+
+                ParseObject testObject = new ParseObject("TestObject");
+                testObject.put("foo", "bar");
+                testObject.saveInBackground();
+
+                //txtViewGcm = (TextView)findViewById(R.id.idTxtViewGCM);
+               // utilidadesGcm.ObtemId(PROJECT_NUMBER, contexto, gcm, txtViewGcm);
 
                 break;
 
@@ -158,13 +164,17 @@ public class MainActivity extends Activity implements View.OnClickListener{
             SharedPreferences.Editor prefsEditor = mPrefs.edit();
             JSONArray array = new JSONArray();
             JSONObject obj;
+            ParseObject alimentosParse;
 
             for(Alimentos item : alimentos){
                 obj = new JSONObject();
+                //alimentosParse = new ParseObject("Alimentos");
                 try {
                     obj.put("nome", item.getNome());
+                    //alimentosParse.put("nome", item.getNome());
                     obj.put("quantidade", item.getQuantidade());
-
+                    //alimentosParse.put("quantidade", item.getQuantidade());
+                    //alimentosParse.saveInBackground();
                     array.put(obj);
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -307,6 +317,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
         descritor.setContent(R.id.idListViewAmigos);
         descritor.setIndicator("Lista de amigos");
         tab.addTab(descritor);
+
+
+        //Inicio da configuracao do Parse
+        Parse.enableLocalDatastore(this);
+        Parse.initialize(this, "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
+
+
+
+
 
         final SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
 

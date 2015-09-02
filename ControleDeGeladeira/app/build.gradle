@@ -22,6 +22,8 @@ android {
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
     compile 'com.android.support:appcompat-v7:22.2.0'
-    compile 'com.google.android.gms:play-services:7.5.0'
+    //compile 'com.google.android.gms:play-services:7.5.0'
+    compile 'com.parse.bolts:bolts-android:1.+'
     compile project(path: ':GCM', configuration: 'android-endpoints')
+    compile files('C:/Users/ramon.silva/Documents/GitHub/Android/ControleDeGeladeira/libs/Parse-1.10.1.jar')
 }

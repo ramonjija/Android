@@ -12,10 +12,16 @@ import android.widget.EditText;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,8 +82,49 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         EditText txtSenha = (EditText)findViewById(R.id.idEditTextSenhaUsuario);
         senha = txtSenha.getText().toString();
 
-        if(!cadastroUsuario){
+        if(cadastroUsuario)
+        {
+            try
+            {
 
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("Usuario");
+                query.whereEqualTo("nome", nome);
+                query.findInBackground(new FindCallback<ParseObject>() {
+                                           @Override
+                                           public void done(List<ParseObject> list, ParseException e) {
+                                               if (e == null) {
+
+                                                   Toast.makeText(getApplicationContext(), "Usuario já cadastrado", Toast.LENGTH_SHORT).show();
+
+                                               } else {
+                                                       ParseObject usuarioCadastrado = new ParseObject("Usuario");
+
+                                                       usuarioCadastrado.put("nome", nome);
+                                                       usuarioCadastrado.put("senha", senha);
+                                                       usuarioCadastrado.saveInBackground();
+                                                   Toast.makeText(getApplicationContext(), "Usuario cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+
+                                               }
+                                           }
+                                       }
+
+
+                );
+                txtNome.setText("");
+                txtSenha.setText("");
+
+
+
+            }
+            catch (Exception ex){
+                ex.getMessage();
+                Toast.makeText(getApplicationContext(), "Nao foi possível cadastrar esse usuario", Toast.LENGTH_SHORT).show();
+            }
+
+        }
+
+        else{
             usuario = new Usuario(nome,senha);
             listaDeUsuarios.add(usuario);
 
@@ -110,8 +157,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             MainIntentActivity.putExtras(params);*/
 
             startActivity(MainIntentActivity);
-        }else {
-            Toast.makeText(getApplicationContext(), "Nao pode cadastrar esse usuario", Toast.LENGTH_SHORT).show();
         }
 
     }

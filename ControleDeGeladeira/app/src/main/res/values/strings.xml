@@ -11,7 +11,7 @@
     <string name="txtBtnPlus">+</string>
     <string name="txtBtnExclude">Excluir</string>
     <string name="txtBtnMinus">-</string>
-    <string name="obterGcm">Obter GCM</string>
+    <string name="obterGcm">Obter PARSE</string>
     <string name="title_activity_cadastro_usuario">Cadastro de Usuarios</string>
     <string name="Senha">Senha:</string>
     <string name="textoCadastroUsuario">Me cadastrar</string>

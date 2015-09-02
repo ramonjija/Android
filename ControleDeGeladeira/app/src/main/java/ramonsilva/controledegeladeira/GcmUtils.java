@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.TextView;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
+//import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 
 import org.w3c.dom.Text;
@@ -17,7 +17,7 @@ import java.io.IOException;
  */
 public class GcmUtils {
 
-    protected void ObtemId(final String PROJECT_NUMBER, final Context Contexto, final GoogleCloudMessaging gcmEnviado, final TextView txtView){
+   /* protected void ObtemId(final String PROJECT_NUMBER, final Context Contexto, final GoogleCloudMessaging gcmEnviado, final TextView txtView){
 
         new AsyncTask<Void, Void, String>(){
             @Override
@@ -42,11 +42,11 @@ public class GcmUtils {
             /*@Override
             protected void onPostExecute(String s) {
                 txtView.setText(s);
-            }*/
+            }
 
         }.execute(null,null,null);
 
-    }
+    }*/
 
 
 }

@@ -7,6 +7,15 @@ public class Usuario {
 
     private String nome;
     private String senha;
+    private int idLista;
+
+    public int getIdLista() {
+        return idLista;
+    }
+
+    public void setIdLista(int idLista) {
+        this.idLista = idLista;
+    }
 
     public String getSenha() {
         return senha;
