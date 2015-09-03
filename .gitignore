@@ -41,3 +41,31 @@ $RECYCLE.BIN/
 Network Trash Folder
 Temporary Items
 .apdisk
+
+# General Folders
+
+# gradle/ comment this when using gradle wrapper.
+build/
+bin/
+gen/
+tmp/
+# proguard/ comment if not using proguard.
+.gradle/
+.settings/
+.idea/
+
+# General Files
+
+.project
+.classpath
+.DS_Store
+local.properties
+*.iml
+# gradlew comment when using gradle wrapper
+# gradlew.bat comment when using gradle wrapper
+Thumbs.db
+
+
+# files specific to current project
+# your_apk.apk
+

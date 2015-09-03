@@ -20,6 +20,7 @@ import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
+import android.widget.Toast;
 
 //import com.google.android.gms.gcm.GoogleCloudMessaging;
 
@@ -29,8 +30,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.parse.FindCallback;
+import com.parse.GetCallback;
 import com.parse.Parse;
+import com.parse.ParseException;
+import com.parse.ParseInstallation;
 import com.parse.ParseObject;
+import com.parse.ParseQuery;
 
 
 public class MainActivity extends Activity implements View.OnClickListener{
@@ -160,11 +166,18 @@ public class MainActivity extends Activity implements View.OnClickListener{
     protected void SalvarLista(){
 
             //SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
+            //SharedPreferences de Alimentos
             SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
             SharedPreferences.Editor prefsEditor = mPrefs.edit();
+            //SharedPreferences de Usuario
+            SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
+            SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
+
             JSONArray array = new JSONArray();
             JSONObject obj;
-            ParseObject alimentosParse;
+        final String[] objId = new String[1];
+        final ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
+            final ParseQuery<ParseObject> query;
 
             for(Alimentos item : alimentos){
                 obj = new JSONObject();
@@ -180,8 +193,73 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     e.printStackTrace();
                 }
             }
-            String arrayStr = array.toString();
-            prefsEditor.putString("alimentos", arrayStr).commit();
+            final String arrayStr = array.toString();
+        //
+        //Parse
+            final String idUsuario = idUsuarioPref.getString("idUsuario","Inexistente");
+
+            query = ParseQuery.getQuery("ListaDeAlimentos");
+            //query.whereEqualTo("IdUsuario", "Xn9ZXg3qcu");
+            query.whereEqualTo("IdUsuario", idUsuario);
+
+            query.findInBackground(new FindCallback<ParseObject>() {
+                @Override
+                public void done(List<ParseObject> list, ParseException e) {
+                    if(e != null) {
+                        e.printStackTrace();
+                    }
+                    else if(list.isEmpty()){
+                            //Lista de alimentos não encontrada
+                            //alimentosParse = new ParseObject("ListaDeAlimentos");
+                            alimentosParse.put("Alimentos", arrayStr);
+                            alimentosParse.put("IdUsuario", idUsuario);
+                            //alimentosParse.put("IdUsuario", "Xn9ZXg3qcu");
+                            alimentosParse.saveInBackground();
+                            Toast.makeText(getApplicationContext(), "Lista salva",Toast.LENGTH_SHORT).show();
+                        }
+                        else{
+                            //Lista de alimentos encontrada
+                            String objectId = null;
+                            for(ParseObject objetos : list){
+                                objectId = objetos.getObjectId();
+                            }
+
+                            query.getInBackground(objectId, new GetCallback<ParseObject>() {
+                                @Override
+                                public void done(ParseObject parseObject, ParseException e) {
+                                    if(e == null){
+                                        parseObject.put("Alimentos", arrayStr);
+                                        parseObject.saveInBackground();
+                                        Toast.makeText(getApplicationContext(), "Lista atualizada",Toast.LENGTH_SHORT).show();
+                                    }
+                                }
+                            });
+                        }
+                    }
+            });
+
+            /*query.getInBackground("Xn9ZXg3qcu", new GetCallback<ParseObject>() {
+                @Override
+                public void done(ParseObject parseObject, ParseException e) {
+                    if(e == null){
+                        parseObject.put("Alimentos", arrayStr);
+                        parseObject.saveInBackground();
+                    }
+                }
+            });*/
+
+            //alimentosParse = new ParseObject("ListaDeAlimentos");
+           // alimentosParse.put("Alimentos", arrayStr);
+           // alimentosParse.put("IdUsuario","Xn9ZXg3qcu");
+           // alimentosParse.saveInBackground();
+
+
+        //
+
+
+        prefsEditor.putString("alimentos", arrayStr).commit();
+
+
 
 
 
@@ -282,7 +360,36 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
     }
 
+    protected void ChecarUsuarioCadastrado(){
+        SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
 
+        if(idUsuarioPref.getString("idUsuario","Inexistente").equals("Inexistente"))
+        {
+            Intent i = new Intent(this, CadastroUsuarioActivity.class);
+            startActivity(i);
+            Log.i("UsuarioCadastrado","Usuario não cadastrado. Iniciando o cadastro");
+        }
+        else{
+            Log.i("UsuarioCadastrado","Usuario Cadastrado id = " + idUsuarioPref.getString("idUsuario","Inexistente"));
+        }
+    }
+
+    protected void LimparListaDeAmigosJson(){
+        amigos.clear();
+    }
+
+
+    private void InitParse(){
+        try {
+            Parse.enableLocalDatastore(getApplicationContext());
+            Parse.initialize(getApplication(), "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
+            ParseInstallation.getCurrentInstallation().saveInBackground();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
 
     private class AlimentoAdapter extends ArrayAdapter{
             public AlimentoAdapter(){
@@ -320,10 +427,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
 
         //Inicio da configuracao do Parse
-        Parse.enableLocalDatastore(this);
-        Parse.initialize(this, "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
+        //Parse.enableLocalDatastore(this);
+        //Parse.initialize(this, "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
+
+        InitParse();
 
 
+        //Verifica se o usuario foi cadastrado
 
 
 
@@ -333,6 +443,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         contexto = getApplicationContext();
 
+        ChecarUsuarioCadastrado();
         //RecuperarListaDoJson(mPrefs);
         RecuperarListaDoJson();
         RecuperarListaDeAmigosJson();
@@ -487,8 +598,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
 
 
-
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -513,7 +622,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     @Override
     protected void onPause() {
-        SalvarLista();
+        //SalvarLista();
         super.onPause();
     }
 }
