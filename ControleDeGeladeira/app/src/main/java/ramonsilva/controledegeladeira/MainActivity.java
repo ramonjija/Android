@@ -366,6 +366,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         if(idUsuarioPref.getString("idUsuario","Inexistente").equals("Inexistente"))
         {
+            //CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
             Intent i = new Intent(this, CadastroUsuarioActivity.class);
             startActivity(i);
             Log.i("UsuarioCadastrado","Usuario não cadastrado. Iniciando o cadastro");
@@ -375,20 +376,26 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    protected void LimparListaDeAmigosJson(){
+    /*protected void LimparListaDeAmigosJson(){
         amigos.clear();
-    }
+    }*/
 
 
     private void InitParse(){
-        try {
-            Parse.enableLocalDatastore(getApplicationContext());
-            Parse.initialize(getApplication(), "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
-            ParseInstallation.getCurrentInstallation().saveInBackground();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
 
+        Bundle extras = getIntent().getExtras();
+        if (extras == null) {
+            try {
+                //Parse.enableLocalDatastore(getApplicationContext());
+                //Parse.initialize(getApplication(), "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
+                Parse.enableLocalDatastore(this);
+                Parse.initialize(this, "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
+                //ParseInstallation.getCurrentInstallation().saveInBackground();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            //String value = extras.getString("ParseIniciado");
+        }
     }
 
     private class AlimentoAdapter extends ArrayAdapter{
@@ -439,7 +446,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         final SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
 
-        utilidadesGcm = new GcmUtils();
+        //utilidadesGcm = new GcmUtils();
 
         contexto = getApplicationContext();
 

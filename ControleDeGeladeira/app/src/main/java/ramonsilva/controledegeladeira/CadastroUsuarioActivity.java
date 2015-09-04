@@ -1,5 +1,6 @@
 package ramonsilva.controledegeladeira;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -49,6 +50,13 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     private RadioButton rdoBtnSalvarAmigos;
 
 
+
+    private void PassarParametroEiniciarActivity(Intent i){
+        i = new Intent(getApplicationContext(), MainActivity.class);
+        i.putExtra("ParseIniciado","sim");
+        startActivity(i);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -69,9 +77,11 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         }
 
         botaoSalvarUsuario = (Button) findViewById(R.id.idBtnSalvarUsuario);
+        //
 
-        listaDeUsuarios = (ArrayList) listaDeUsuariosRecebidos;
-        listaDeUsuariosRecebidos = null;
+            listaDeUsuarios = (ArrayList) listaDeUsuariosRecebidos;
+            listaDeUsuariosRecebidos = null;
+
 
         radioGroupUsuarios = (RadioGroup) findViewById(R.id.idRadioGroupCadastroUsuario);
         radioGroupUsuarios.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
@@ -84,12 +94,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
             }
         });
-
-        /*EditText txtNome = (EditText)findViewById(R.id.idEditTextNomeUsuario);
-        nome = txtNome.getText().toString();
-
-        EditText txtSenha = (EditText)findViewById(R.id.idEditTextSenhaUsuario);
-        senha = txtSenha.getText().toString();*/
 
         botaoSalvarUsuario.setOnClickListener(this);
 
@@ -172,6 +176,9 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
         } else {
             usuario = new Usuario(nome, senha);
+            if(listaDeUsuarios == null){
+                listaDeUsuarios = new ArrayList<Usuario>();
+            }
             listaDeUsuarios.add(usuario);
 
             //Codigo Anterior
@@ -247,7 +254,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                 je.printStackTrace();
                             }
                         }
-                        final String arrayStr = array.toString();
+                        final String arrayStr = array.toString();//VERIFICAR
                         prefsEditor.putString("usuarios", arrayStr).commit();
 
                         //Passo 2.1.1 : Verificar se existe lista de amigos
@@ -257,15 +264,15 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                             final ParseObject listaDeAmigos = new ParseObject("ListaDeAmigos");
 
                             listaDeAmigos.put("IdUsuario",  idUsuario.getString("idUsuario","Inexistente"));// idUsuario.getString("IdUsuario", "Inexistente"));
-
                             listaDeAmigos.put("Dados", arrayStr);
                             listaDeAmigos.saveInBackground(new SaveCallback() {
                                 @Override
                                 public void done(ParseException e) {
                                     if (e == null) {
                                         prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
+                                        prefsEditorListaAmigos.commit();
                                         Toast.makeText(getApplicationContext(), "Amigo cadastrado com sucesso", Toast.LENGTH_SHORT).show();
-                                        startActivity(i);
+                                        PassarParametroEiniciarActivity(i);
 
                                     }
                                 }
@@ -273,20 +280,22 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                         } else {
 
                             //Lista Existe dar update
-
+                            /*
                             String listObjectId = null;
                             for (ParseObject objetos : list) {
                                 listObjectId = objetos.getObjectId();
                             }
-
-                            queryAmigo.getInBackground(listObjectId, new GetCallback<ParseObject>() {
+                            */
+                            String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
+                            ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
+                            queryAmigoUpdate.getInBackground(idListaAmigo, new GetCallback<ParseObject>() {
                                 @Override
                                 public void done(ParseObject parseObject, ParseException e) {
                                     if (e == null) {
                                         parseObject.put("Dados", arrayStr);
                                         parseObject.saveInBackground();
                                         Toast.makeText(getApplicationContext(), "Lista de amigos atualizada com sucesso", Toast.LENGTH_SHORT).show();
-                                        startActivity(i);
+                                        PassarParametroEiniciarActivity(i);
                                     }
                                 }
                             });
@@ -302,6 +311,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         }
         txtNome.setText("");
         txtSenha.setText("");
+        Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
 
        //Intent i = new Intent(v.getContext(), MainActivity.class);
         //startActivity(i);
