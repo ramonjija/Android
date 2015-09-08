@@ -167,14 +167,14 @@
                     <TextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:id="@+id/idTxtViewGCM" />
+                        android:id="@+id/idTxtViewListaAmigo" />
 
                     <Button
-                        android:id="@+id/idBtnObterGCM"
+                        android:id="@+id/idBtnObterListaAmigo"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:text="@string/obterGcm"
+                        android:text="@string/obterListaAmigo"
                         android:visibility="invisible"/>
 
                     <Button
@@ -190,7 +190,7 @@
                         android:layout_alignParentRight="false"
                         android:layout_alignWithParentIfMissing="false"
                         android:layout_centerHorizontal="true"
-                        android:layout_above="@+id/idBtnObterGCM"
+                        android:layout_above="@+id/idBtnObterListaAmigo"
                         android:visibility="invisible"/>
                 </RelativeLayout>
                 <!--

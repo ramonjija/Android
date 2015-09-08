@@ -22,8 +22,6 @@ import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
 
-//import com.google.android.gms.gcm.GoogleCloudMessaging;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -59,15 +57,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button botaosalvarAlimento = null;
 
-    //private GoogleCloudMessaging gcm = null;
-    private String regid = null;
-    private String PROJECT_NUMBER = "560915181661";
-    private Button botaoObterGcm = null;
-    private GcmUtils utilidadesGcm = null;
-
-    private TextView txtViewGcm = null;
+    private Button botaoObterListaAmigo = null;
 
     private List<Usuario> amigos = new ArrayList<Usuario>();
+    private Usuario amigoSelecionado = null;
     private Usuario usuario;
 
     private Button botaoCadastrarUsuario = null;
@@ -108,17 +101,44 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                break;
 
-            case R.id.idBtnObterGCM:
+            case R.id.idBtnObterListaAmigo:
+                JSONArray arrayAlimentos;
+                if(amigoSelecionado != null) {
+                    String message = "Lista Atualizada com sucesso: " + amigoSelecionado.getNome();
+                    String idListaUsuario = null;
+                    try {
+                        idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
+                    } catch (ParseException e) {
+                        e.printStackTrace();
+                    }
+                    if (idListaUsuario != null) {
+                        //String idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
+                        arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
+                        alimentos.clear();
+                        JSONObject obj;
+                        Alimentos alimento;
+                        for (int i = 0; i <= arrayAlimentos.length(); i++) {
+                            try {
+                                obj = arrayAlimentos.getJSONObject(i);
+                                alimento = new Alimentos();
+                                alimento.setNome(obj.getString("nome"));
+                                alimento.setQuantidade(obj.getString("quantidade"));
+                                alimentos.add(alimento);
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
 
-                ParseObject testObject = new ParseObject("TestObject");
-                testObject.put("foo", "bar");
-                testObject.saveInBackground();
 
-                //txtViewGcm = (TextView)findViewById(R.id.idTxtViewGCM);
-               // utilidadesGcm.ObtemId(PROJECT_NUMBER, contexto, gcm, txtViewGcm);
+                        }
 
-                break;
+                    } else {
 
+                        message = "O usuario " + amigoSelecionado.getNome() + " nao possui lista!";
+
+                    }
+                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+                    break;
+                }
             case R.id.idBtnCadastroUsuario:
 
                 Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
@@ -133,36 +153,24 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     }
 
+    private JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) {
+        final JSONArray[] ListaAlimentosObtidos = {new JSONArray()};//TODO: Fazer sincrono find();
 
-
-
- /*
-    protected void ObtemId(){
-        new AsyncTask<Void, Void, String>(){
+        ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
+        queryListaAlimento.getInBackground(idListaUsuario, new GetCallback<ParseObject>() {
             @Override
-            protected String doInBackground(Void... params) {
-                String idDoAparelho = "";
-                try{
-                    if(gcm == null){
-                        gcm = GoogleCloudMessaging.getInstance(getApplicationContext());
-                    }
-                    regid = gcm.register(PROJECT_NUMBER);
-                    idDoAparelho = regid;
-                    Log.i("GCM", idDoAparelho);
-                }catch (IOException ex){
-                    idDoAparelho = "Erro: "+ex.getMessage();
+            public void done(ParseObject parseObject, ParseException e) {
+                if(e==null){
+                    //sem problemas
+                    ListaAlimentosObtidos[0] = (JSONArray)parseObject.get("Alimentos");
                 }
-
-                return idDoAparelho;
             }
+        });
 
-           /* @Override
-            protected void onPostExecute(String s) {
-                super.onPostExecute(s);
-            }
-        }.execute(null,null,null);
+        return ListaAlimentosObtidos[0];
     }
-*/
+
+
     protected void SalvarLista(){
 
             //SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
@@ -446,7 +454,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         final SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
 
-        //utilidadesGcm = new GcmUtils();
 
         contexto = getApplicationContext();
 
@@ -531,6 +538,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         });
 
+        listaDeAmigos.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                amigoSelecionado = (Usuario)parent.getItemAtPosition(position);
+            }
+        });
+
+
+
 
 
         botaosalvarAlimento = (Button) findViewById(R.id.idBtnSalvar);
@@ -548,8 +564,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         botaoSalvarLista = (Button)findViewById(R.id.idBtnSalvarLista);
         botaoSalvarLista.setOnClickListener(this);
 
-        botaoObterGcm = (Button)findViewById(R.id.idBtnObterGCM);
-        botaoObterGcm.setOnClickListener(this);
+        botaoObterListaAmigo = (Button)findViewById(R.id.idBtnObterListaAmigo);
+        botaoObterListaAmigo.setOnClickListener(this);
 
         botaoCadastrarUsuario = (Button)findViewById(R.id.idBtnCadastroUsuario);
         botaoCadastrarUsuario.setOnClickListener(this);
@@ -563,7 +579,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoExcluir.setVisibility(View.VISIBLE);
                                                 botaoSalvarLista.setVisibility(View.VISIBLE);
 
-                                                botaoObterGcm.setVisibility(View.INVISIBLE);
+                                                botaoObterListaAmigo.setVisibility(View.INVISIBLE);
                                                 botaosalvarAlimento.setVisibility(View.INVISIBLE);
 
                                                 botaoCadastrarUsuario.setVisibility(View.INVISIBLE);
@@ -575,7 +591,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoMenos.setVisibility(View.INVISIBLE);
                                                 botaoExcluir.setVisibility(View.INVISIBLE);
                                                 botaoSalvarLista.setVisibility(View.INVISIBLE);
-                                                botaoObterGcm.setVisibility(View.INVISIBLE);
+                                                botaoObterListaAmigo.setVisibility(View.INVISIBLE);
                                                 botaoCadastrarUsuario.setVisibility(View.INVISIBLE);
 
                                                 botaosalvarAlimento.setVisibility(View.VISIBLE);
@@ -587,11 +603,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoMenos.setVisibility(View.INVISIBLE);
                                                 botaoExcluir.setVisibility(View.INVISIBLE);
                                                 botaoSalvarLista.setVisibility(View.INVISIBLE);
-                                                botaoObterGcm.setVisibility(View.INVISIBLE);
+                                                botaoObterListaAmigo.setVisibility(View.INVISIBLE);
 
                                                 botaosalvarAlimento.setVisibility(View.INVISIBLE);
 
-                                                botaoObterGcm.setVisibility(View.VISIBLE);
+                                                botaoObterListaAmigo.setVisibility(View.VISIBLE);
                                                 botaoCadastrarUsuario.setVisibility(View.VISIBLE);
 
 

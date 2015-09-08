@@ -48,6 +48,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     private SharedPreferences.Editor prefsEditorListaAmigos;
     private RadioButton rdoBtnSalvarUsuario;
     private RadioButton rdoBtnSalvarAmigos;
+    private String mensagem = "Aguarde...";
 
 
 
@@ -55,6 +56,28 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         i = new Intent(getApplicationContext(), MainActivity.class);
         i.putExtra("ParseIniciado","sim");
         startActivity(i);
+    }
+
+    private boolean VerificarSeAmigoEstaCadastrado(List<Usuario> listaDeAmigos, String nome){
+        boolean cadastrado = false;
+
+        if(listaDeAmigos != null)
+        {
+            if (!listaDeAmigos.isEmpty())
+            {
+
+                for (Usuario amigo : listaDeAmigos)
+                {
+                    if ((amigo.getNome()).equals(nome))
+                    {
+                        cadastrado = true;
+                        break;
+                    }
+                }
+
+            }
+        }
+        return cadastrado;
     }
 
     @Override
@@ -103,7 +126,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     @Override
     public void onClick(View v) {
-
+        mensagem = "Aguarde...";
         EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
         nome = txtNome.getText().toString();
 
@@ -124,7 +147,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                   public void done(List<ParseObject> list, ParseException e) {
                                                       if (e != null) {
 
-                                                          Toast.makeText(getApplicationContext(), "Um erro ocorreu", Toast.LENGTH_SHORT).show();
+                                                          Toast.makeText(getApplicationContext(), "Um erro ocorreu: "+ e.getMessage(), Toast.LENGTH_SHORT).show();
                                                           e.printStackTrace();
 
                                                           //Toast.makeText(getApplicationContext(), "Usuario ja cadastrado", Toast.LENGTH_SHORT).show();
@@ -176,12 +199,13 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
         } else {
             usuario = new Usuario(nome, senha);
-            if(listaDeUsuarios == null){
+            if (listaDeUsuarios == null) {
                 listaDeUsuarios = new ArrayList<Usuario>();
             }
-            listaDeUsuarios.add(usuario);
+            if (!VerificarSeAmigoEstaCadastrado(listaDeUsuarios, nome)) {
+                listaDeUsuarios.add(usuario);
 
-            //Codigo Anterior
+                //Codigo Anterior
             /*
             SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
             SharedPreferences.Editor prefsEditor = mPrefs.edit();
@@ -213,105 +237,108 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
             //startActivity(MainIntentActivity);*/
 
-            //Inicio da verificação de autoziação de usuario e cadastro de lista
-            //Passo 1 - Verificar se o user e senha batem com os da lista de usuario
-            //Passo 2 - Se existirem, inserir no prefs acima
+                //Inicio da verificação de autoziação de usuario e cadastro de lista
+                //Passo 1 - Verificar se o user e senha batem com os da lista de usuario
+                //Passo 2 - Se existirem, inserir no prefs acima
             /*Passo 2.1 - Inserir a lista em json na tabela ListaDeAmigos no parse utilizando o json
             como Dados e o id do usuario cadastrado obtido acima, como IdUsuario
              */
 
-            //Passo 1:
-            final ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
-            queryAmigo.whereEqualTo("nome", nome);
-            queryAmigo.whereEqualTo("senha", senha);
+                //Passo 1:
+                final ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
+                queryAmigo.whereEqualTo("nome", nome);
+                queryAmigo.whereEqualTo("senha", senha);
 
-            queryAmigo.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(final List<ParseObject> list, ParseException e) {
-                    if (e != null) {
-                        Log.i("CadastroAmigo", "Ocorreu um erro no cadastro de amigo " + e.getMessage());
-                        e.printStackTrace();
-                    } else if (list.isEmpty()) {
-                        Toast.makeText(getApplicationContext(), "Amigo não encontrado", Toast.LENGTH_SHORT).show();
+                queryAmigo.findInBackground(new FindCallback<ParseObject>() {
+                    @Override
+                    public void done(final List<ParseObject> list, ParseException e) {
+                        if (e != null) {
+                            Log.i("CadastroAmigo", "Ocorreu um erro no cadastro de amigo " + e.getMessage());
+                            e.printStackTrace();
+                        } else if (list.isEmpty()) {
+                            Toast.makeText(getApplicationContext(), "Amigo não encontrado", Toast.LENGTH_SHORT).show();
 
-                    } else {
-                        //Encontrou o amigo
-                        //Passo 2:
-                        SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
-                        SharedPreferences.Editor prefsEditor = mPrefs.edit();
-
-                        JSONArray array = new JSONArray();
-                        JSONObject obj;
-
-                        for (Usuario usuario : listaDeUsuarios) {
-                            obj = new JSONObject();
-                            try {
-                                obj.put("nomeUsuario", usuario.getNome());
-                                obj.put("senhaUsuario", usuario.getSenha());
-
-                                array.put(obj);
-                            } catch (JSONException je) {
-                                je.printStackTrace();
-                            }
-                        }
-                        final String arrayStr = array.toString();//VERIFICAR
-                        prefsEditor.putString("usuarios", arrayStr).commit();
-
-                        //Passo 2.1.1 : Verificar se existe lista de amigos
-
-                        if (idListaAmigos.getString("idListaAmigo", "ListaInexistente").equals("ListaInexistente")) {
-
-                            final ParseObject listaDeAmigos = new ParseObject("ListaDeAmigos");
-
-                            listaDeAmigos.put("IdUsuario",  idUsuario.getString("idUsuario","Inexistente"));// idUsuario.getString("IdUsuario", "Inexistente"));
-                            listaDeAmigos.put("Dados", arrayStr);
-                            listaDeAmigos.saveInBackground(new SaveCallback() {
-                                @Override
-                                public void done(ParseException e) {
-                                    if (e == null) {
-                                        prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
-                                        prefsEditorListaAmigos.commit();
-                                        Toast.makeText(getApplicationContext(), "Amigo cadastrado com sucesso", Toast.LENGTH_SHORT).show();
-                                        PassarParametroEiniciarActivity(i);
-
-                                    }
-                                }
-                            });
                         } else {
+                            //Encontrou o amigo
+                            //Passo 2:
+                            SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+                            SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
-                            //Lista Existe dar update
+                            JSONArray array = new JSONArray();
+                            JSONObject obj;
+
+                            for (Usuario usuario : listaDeUsuarios) {
+                                obj = new JSONObject();
+                                try {
+                                    obj.put("nomeUsuario", usuario.getNome());
+                                    obj.put("senhaUsuario", usuario.getSenha());
+
+                                    array.put(obj);
+                                } catch (JSONException je) {
+                                    je.printStackTrace();
+                                }
+                            }
+                            final String arrayStr = array.toString();//VERIFICAR
+                            prefsEditor.putString("usuarios", arrayStr).commit();
+
+                            //Passo 2.1.1 : Verificar se existe lista de amigos
+
+                            if (idListaAmigos.getString("idListaAmigo", "ListaInexistente").equals("ListaInexistente")) {
+
+                                final ParseObject listaDeAmigos = new ParseObject("ListaDeAmigos");
+
+                                listaDeAmigos.put("IdUsuario", idUsuario.getString("idUsuario", "Inexistente"));// idUsuario.getString("IdUsuario", "Inexistente"));
+                                listaDeAmigos.put("Dados", arrayStr);
+                                listaDeAmigos.saveInBackground(new SaveCallback() {
+                                    @Override
+                                    public void done(ParseException e) {
+                                        if (e == null) {
+                                            prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
+                                            prefsEditorListaAmigos.commit();
+                                            Toast.makeText(getApplicationContext(), "Amigo cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+                                            PassarParametroEiniciarActivity(i);
+
+                                        }
+                                    }
+                                });
+                            } else {
+
+                                //Lista Existe dar update
                             /*
                             String listObjectId = null;
                             for (ParseObject objetos : list) {
                                 listObjectId = objetos.getObjectId();
                             }
                             */
-                            String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
-                            ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
-                            queryAmigoUpdate.getInBackground(idListaAmigo, new GetCallback<ParseObject>() {
-                                @Override
-                                public void done(ParseObject parseObject, ParseException e) {
-                                    if (e == null) {
-                                        parseObject.put("Dados", arrayStr);
-                                        parseObject.saveInBackground();
-                                        Toast.makeText(getApplicationContext(), "Lista de amigos atualizada com sucesso", Toast.LENGTH_SHORT).show();
-                                        PassarParametroEiniciarActivity(i);
+                                String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
+                                ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
+                                queryAmigoUpdate.getInBackground(idListaAmigo, new GetCallback<ParseObject>() {
+                                    @Override
+                                    public void done(ParseObject parseObject, ParseException e) {
+                                        if (e == null) {
+                                            parseObject.put("Dados", arrayStr);
+                                            parseObject.saveInBackground();
+                                            Toast.makeText(getApplicationContext(), "Lista de amigos atualizada com sucesso", Toast.LENGTH_SHORT).show();
+                                            PassarParametroEiniciarActivity(i);
+                                        }
                                     }
-                                }
-                            });
+                                });
+
+                            }
+
 
                         }
-
-
                     }
-                }
-            });
+                });
 
 
+            }else{
+                mensagem = "Amigo já cadastrado!";
+            }
         }
         txtNome.setText("");
         txtSenha.setText("");
-        Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
 
        //Intent i = new Intent(v.getContext(), MainActivity.class);
         //startActivity(i);

@@ -1,5 +1,14 @@
 package ramonsilva.controledegeladeira;
 
+import android.widget.Toast;
+
+import com.parse.FindCallback;
+import com.parse.ParseException;
+import com.parse.ParseObject;
+import com.parse.ParseQuery;
+
+import java.util.List;
+
 /**
  * Created by ramon.silva on 27/08/2015.
  */
@@ -32,6 +41,8 @@ public class Amigos {
     public void setId(String id) {
         this.id = id;
     }
+
+
 
     @Override
     public String toString() {
