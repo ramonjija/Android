@@ -16,4 +16,5 @@
     <string name="Senha">Senha:</string>
     <string name="textoCadastroUsuario">Me cadastrar</string>
     <string name="textoCadastrarAmigo">Cadastrar Amigo</string>
+    <string name="prefKeyResetQuests">resetQuests</string>
 </resources>

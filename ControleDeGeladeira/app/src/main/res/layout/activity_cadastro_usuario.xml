@@ -63,14 +63,15 @@
     <RadioGroup
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/idRadBtnCadastroAmigo"
-        android:layout_toStartOf="@+id/idRadBtnCadastroAmigo"
         android:weightSum="1"
         android:orientation="horizontal"
         android:checkedButton="@+id/idRadBtnUsuario"
         android:id="@+id/idRadioGroupCadastroUsuario"
         android:layout_above="@+id/idBtnSalvarUsuario"
         android:layout_below="@+id/idEditTextSenhaUsuario">
+        <!--android:layout_toLeftOf="@+id/idRadBtnCadastroAmigo"
+        android:layout_toStartOf="@+id/idRadBtnCadastroAmigo"-->
+
 
         <!--<RelativeLayout
             android:layout_width="match_parent"
@@ -100,19 +101,13 @@
             android:layout_height="149dp"
             android:text="@string/textoCadastroUsuario"
             android:id="@+id/idRadBtnUsuario"
-            android:layout_alignTop="@+id/idRadBtnCadastroAmigo"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
             android:layout_weight="0.83" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/textoCadastrarAmigo"
-            android:id="@+id/idRadBtnCadastroAmigo"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true" />
+            android:id="@+id/idRadBtnCadastroAmigo" />
     </RadioGroup>
 
 </RelativeLayout>

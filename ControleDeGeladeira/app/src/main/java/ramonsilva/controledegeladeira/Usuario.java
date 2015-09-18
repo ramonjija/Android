@@ -88,7 +88,7 @@ public class Usuario {
             }
         });
         */
-
+        //TODO: Exemplo de metodo sincrono
         ParseQuery<ParseObject> queryUsuario = ParseQuery.getQuery("Usuario");
         queryUsuario.whereEqualTo("nome", nome);
         List<ParseObject> objUsuario = queryUsuario.find();
@@ -96,7 +96,7 @@ public class Usuario {
             idUsuario = obj.getObjectId();
         }
         ParseQuery<ParseObject> queryLista = ParseQuery.getQuery("ListaDeAlimentos");
-        queryLista.whereEqualTo("idUsuario", idUsuario);
+        queryLista.whereEqualTo("IdUsuario", idUsuario);
         List<ParseObject> objLista = queryLista.find();
         for(ParseObject obj : objLista) {
             idListaUsuario = obj.getObjectId();
