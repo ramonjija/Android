@@ -170,12 +170,14 @@
                         android:id="@+id/idTxtViewListaAmigo" />
 
                     <Button
-                        android:id="@+id/idBtnObterListaAmigo"
-                        android:layout_width="fill_parent"
+                    android:id="@+id/idBtnExcluirAmigo"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:text="@string/obterListaAmigo"
+                        android:layout_alignBottom="@+id/idBtnCadastroUsuario"
+                        android:text="Excluir"
+                        android:gravity="center_horizontal"
                         android:visibility="invisible"/>
+                        />
 
                     <Button
                         android:layout_width="wrap_content"
@@ -192,30 +194,18 @@
                         android:layout_centerHorizontal="true"
                         android:layout_above="@+id/idBtnObterListaAmigo"
                         android:visibility="invisible"/>
+
+
+                    <Button
+                        android:id="@+id/idBtnObterListaAmigo"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_alignParentBottom="true"
+                        android:text="@string/obterListaAmigo"
+                        android:visibility="invisible"/>
+
                 </RelativeLayout>
-                <!--
-                <Button
-                    style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txtBtnMinus"
-                    android:id="@+id/idBtnMinus"
-                    android:layout_gravity="left|bottom" />
 
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txtBtnExclude"
-                    android:id="@+id/idBtnExcluir"
-                    android:layout_gravity="center_horizontal|bottom" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/txtBtnPlus"
-                    android:id="@+id/idBtnPlus"
-                    android:layout_gravity="right|bottom" />
-                    -->
             </FrameLayout>
 
 

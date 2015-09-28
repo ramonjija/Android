@@ -67,6 +67,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private Context contexto = null;
 
+    private Button botaoExcluirAmigo = null;
+
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
@@ -159,48 +161,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                         .setNegativeButton("Não", null)
                         .show();
 
-/*
-                JSONArray arrayAlimentos;
-                if (amigoSelecionado != null) {
-                    String message = "Lista Atualizada com sucesso: " + amigoSelecionado.getNome();
-                    String idListaUsuario = null;
-                    try {
-                        idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
-                    } catch (ParseException e) {
-                        e.printStackTrace();
-                    }
-                    if (idListaUsuario != null) {
-                        //String idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
-                        try {
-                            arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
-                            alimentos.clear();
-                            JSONObject obj;
-                            Alimentos alimento;
-                            for (int i = 0; i < arrayAlimentos.length(); i++) {
-                                try {
-                                    obj = arrayAlimentos.getJSONObject(i);
-                                    alimento = new Alimentos();
-                                    alimento.setNome(obj.getString("nome"));
-                                    alimento.setQuantidade(obj.getString("quantidade"));
-                                    alimentos.add(alimento);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        } catch (ParseException e) {
-                            e.printStackTrace();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-
-                    } else {
-
-                        message = "O usuario " + amigoSelecionado.getNome() + " nao possui lista!";
-
-                    }
-                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-
-                }*/
                 break;
 
             case R.id.idBtnCadastroUsuario:
@@ -217,7 +177,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     }
 
-    private JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
+    protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
         JSONArray ListaAlimentosObtidos = null;//
         ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
         queryListaAlimento.whereEqualTo("objectId",idListaUsuario);
@@ -305,30 +265,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     }
             });
 
-            /*query.getInBackground("Xn9ZXg3qcu", new GetCallback<ParseObject>() {
-                @Override
-                public void done(ParseObject parseObject, ParseException e) {
-                    if(e == null){
-                        parseObject.put("Alimentos", arrayStr);
-                        parseObject.saveInBackground();
-                    }
-                }
-            });*/
-
-            //alimentosParse = new ParseObject("ListaDeAlimentos");
-           // alimentosParse.put("Alimentos", arrayStr);
-           // alimentosParse.put("IdUsuario","Xn9ZXg3qcu");
-           // alimentosParse.saveInBackground();
-
-
-        //
-
-
         prefsEditor.putString("alimentos", arrayStr).commit();
-
-
-
-
 
     }
 
@@ -361,6 +298,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 adapter.remove(alimentoSelecionado);
                 alimentoSelecionado.setQuantidade(String.valueOf(qnt + valor));
                 adapter.insert(alimentoSelecionado, posicaoDoALimento);
+            }else if(valor > 0){
+                adapter.remove(alimentoSelecionado);
+                alimentoSelecionado.setQuantidade(String.valueOf(qnt + valor));
+                adapter.insert(alimentoSelecionado, posicaoDoALimento);
             }
         }
 
@@ -375,7 +316,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    //protected void RecuperarListaDoJson(SharedPreferences mPrefs){
     protected void RecuperarListaDoJson(){
         try {
             //JSONArray array = new JSONArray(mPrefs.getString("alimentos","alimentos"));
@@ -443,11 +383,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    /*protected void LimparListaDeAmigosJson(){
-        amigos.clear();
-    }*/
-
-
     private void InitParse(){
 
         Bundle extras = getIntent().getExtras();
@@ -491,6 +426,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         descritor = tab.newTabSpec("aba2");
         descritor.setContent(R.id.Cadastro);
+        //descritor.setIndicator(getString(R.string.cadastro));
         descritor.setIndicator(getString(R.string.cadastro));
         tab.addTab(descritor);
 
@@ -517,32 +453,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
         contexto = getApplicationContext();
 
         ChecarUsuarioCadastrado();
-        //RecuperarListaDoJson(mPrefs);
         RecuperarListaDoJson();
         RecuperarListaDeAmigosJson();
-
-
-
-
-        /*
-        try {
-            JSONArray array = new JSONArray(mPrefs.getString("alimentos","alimentos"));
-            JSONObject obj;
-            Alimentos alimento;
-            for(int i =0; i<array.length(); i++){
-                obj = array.getJSONObject(i);
-                alimento = new Alimentos();
-                alimento.setNome(obj.getString("nome"));
-                alimento.setQuantidade(obj.getString("quantidade"));
-
-                alimentos.add(alimento);
-
-            }
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }*/
-
-
 
         ListView lista = (ListView)findViewById(R.id.idListViewAlimentos);
         lista.setSelector(R.drawable.selected);
@@ -558,31 +470,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         adapterAmigos = new AmigosAdapter();
         listaDeAmigos.setAdapter(adapterAmigos);
 
-
-
-
-
-
-
-        /*amigo.setGMCID("123455");
-        amigo.setId("1");
-        amigo.setNome("AAA");*/
-
-        //amigos.add(amigo);
-
-        /*Intent intent = getIntent();
-        Bundle params = intent.getExtras();
-
-        if(params != null){
-            Amigos amigo = new Amigos();
-            amigo.setNome(params.getString("Nome"));
-            adapterAmigos.add(amigo);
-        }&*/
-
-
-
-
-        //
         lista.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 
             @Override
@@ -629,6 +516,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
         botaoCadastrarUsuario = (Button)findViewById(R.id.idBtnCadastroUsuario);
         botaoCadastrarUsuario.setOnClickListener(this);
 
+        botaoExcluirAmigo = (Button)findViewById(R.id.idBtnExcluirAmigo);
+        botaoExcluirAmigo.setOnClickListener(this);
+
         tab.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
                                         @Override
                                         public void onTabChanged(String tabId) {
@@ -643,6 +533,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                                                 botaoCadastrarUsuario.setVisibility(View.INVISIBLE);
 
+                                                botaoExcluirAmigo.setVisibility(View.INVISIBLE);
+
                                                 EscondeTeclado();
                                             }
                                             if(tabId.equals("aba2")){
@@ -654,6 +546,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoCadastrarUsuario.setVisibility(View.INVISIBLE);
 
                                                 botaosalvarAlimento.setVisibility(View.VISIBLE);
+
+                                                botaoExcluirAmigo.setVisibility(View.INVISIBLE);
 
                                             }
                                             if(tabId.equals("aba3")){
@@ -669,9 +563,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoObterListaAmigo.setVisibility(View.VISIBLE);
                                                 botaoCadastrarUsuario.setVisibility(View.VISIBLE);
 
-
-
-
+                                                botaoExcluirAmigo.setVisibility(View.VISIBLE);
 
                                             }
                                         }

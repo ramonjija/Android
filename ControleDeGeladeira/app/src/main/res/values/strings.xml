@@ -1,20 +1,20 @@
 <resources>
     <string name="app_name">Controle de Geladeira</string>
 
-    <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
     <string name="titutoApp">Lista de Alimentos</string>
     <string name="nome">Nome: </string>
     <string name="quantidadeAlimento">Quantidade: </string>
     <string name="btnSalvar">Salvar</string>
-    <string name="cadastro">Cadastro</string>
+    <string name="cadastro">Cadastrar</string>
     <string name="txtBtnPlus">+</string>
     <string name="txtBtnExclude">Excluir</string>
     <string name="txtBtnMinus">-</string>
     <string name="obterListaAmigo">Obter Lista</string>
     <string name="title_activity_cadastro_usuario">Cadastro de Usuarios</string>
     <string name="Senha">Senha:</string>
-    <string name="textoCadastroUsuario">Me cadastrar</string>
+    <string name="textoCadastroUsuario">Me Cadastrar</string>
     <string name="textoCadastrarAmigo">Cadastrar Amigo</string>
     <string name="prefKeyResetQuests">resetQuests</string>
+    <string name="logar_texto">Me Logar</string>
 </resources>
