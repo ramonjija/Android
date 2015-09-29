@@ -168,6 +168,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
                 CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
                 startActivity(cadastroActivity);
+                this.finish();
 
                 break;
 
@@ -427,7 +428,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         descritor = tab.newTabSpec("aba2");
         descritor.setContent(R.id.Cadastro);
         //descritor.setIndicator(getString(R.string.cadastro));
-        descritor.setIndicator(getString(R.string.cadastro));
+        descritor.setIndicator("Cadastrar Alimento");
         tab.addTab(descritor);
 
         descritor = tab.newTabSpec("aba3");

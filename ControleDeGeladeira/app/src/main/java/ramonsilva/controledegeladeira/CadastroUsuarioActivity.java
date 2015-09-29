@@ -1,6 +1,5 @@
 package ramonsilva.controledegeladeira;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
@@ -17,7 +16,6 @@ import android.widget.Toast;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -27,7 +25,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,10 +79,13 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     }
 
     private void RecuperarListaAmigosLogado(String idUsuarioLogado){
-        ArrayList listaDeAmigos = new ArrayList();
+        SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+
         ParseQuery<ParseObject> queryAmigos = ParseQuery.getQuery("ListaDeAmigos");
-        queryAmigos.whereEqualTo("IdUsuario",idUsuarioLogado);
+        queryAmigos.whereEqualTo("IdUsuario", idUsuarioLogado);
         List<ParseObject> objUsuario = null;
+        String arrayStrAmigos = null;
         try {
             objUsuario = queryAmigos.find();
         } catch (ParseException e) {
@@ -93,10 +93,34 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         }
 
         for(ParseObject obj : objUsuario){
-            listaDeAmigos = (ArrayList) obj.get("Dados");
+           //prefsEditorListaAmigos.putString("Id") = obj.getObjectId();
+            prefsEditorListaAmigos.putString("idListaAmigo", obj.getObjectId());
+            prefsEditorListaAmigos.commit();
+            prefsEditor.putString("usuarios", obj.get("Dados").toString()).commit();
         }
-        if(!listaDeAmigos.isEmpty()){
-            listaDeUsuarios = listaDeAmigos;
+
+
+        ////////////////
+    }
+
+    protected void RecuperarListaDeAlimentos(String idUsuarioLogado){
+        //SharedPreferences de Alimentos
+        SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditorAlimentos = mPrefs.edit();
+
+
+        ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
+        queryListaAlimento.whereEqualTo("IdUsuario",idUsuarioLogado);
+        String idAlimentosListaAmigo = null;
+        List<ParseObject> objLista = null;
+        try {
+            objLista = queryListaAlimento.find();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        for(ParseObject obj : objLista)
+        {
+            prefsEditorAlimentos.putString("alimentos", obj.getString("Alimentos")).commit();
         }
 
     }
@@ -118,6 +142,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
         if (!idUsuario.getString("idUsuario", "Inexistente").equals("Inexistente")) {
             rdoBtnSalvarUsuario.setEnabled(false);
+            rdoBtnLogarUsuario.setEnabled(false);
             rdoBtnSalvarAmigos.setChecked(true);
         }
 
@@ -149,6 +174,13 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     }
 
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        Intent intent = new Intent(this, MainActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     public void onClick(View v) {
@@ -335,19 +367,25 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
             }
             if(idUsuarioLogado != null) {
+                String idListaAlimento = null;
                 prefsEditor.putString("idUsuario", idUsuarioLogado);
                 prefsEditor.commit();
                 Toast.makeText(getApplicationContext(), "Logado! ;)", Toast.LENGTH_SHORT).show();
 
                 RecuperarListaAmigosLogado(idUsuarioLogado);
 
-                try {
-                    MainActivity.ObtemListaAlimentosUsuario(idUsuarioLogado);
+                //Recuperar IdDaListaDeAlimentos
+
+                RecuperarListaDeAlimentos(idUsuarioLogado);
+                //
+
+               /* try {
+                    MainActivity.ObtemListaAlimentosUsuario(idAlimentosListaAmigo); E
                 } catch (ParseException e) {
                     e.printStackTrace();
                 } catch (JSONException e) {
                     e.printStackTrace();
-                }
+                }*/ //Errado isso so pega a lista do amigo, é necessario obter a lista do usuario e carregá-la
 
                 rdoBtnSalvarUsuario.setEnabled(false);
                 rdoBtnSalvarUsuario.setChecked(false);
@@ -366,7 +404,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
 
        //Intent i = new Intent(v.getContext(), MainActivity.class);
-        //startActivity(i);
+       //startActivity(i);
     }
 
     @Override
