@@ -17,4 +17,8 @@
     <string name="textoCadastrarAmigo">Cadastrar Amigo</string>
     <string name="prefKeyResetQuests">resetQuests</string>
     <string name="logar_texto">Me Logar</string>
+    <string name="txt_rdoBtn_Kg">kg</string>
+    <string name="txt_rdoBtn_g">g</string>
+    <string name="txt_rdoBtn_Litro">Litro</string>
+    <string name="txt_rdoBtn_Unidade">Unidade</string>
 </resources>

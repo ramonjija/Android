@@ -104,6 +104,7 @@
                         android:layout_height="wrap_content"
                         android:layout_alignParentTop="true"
                         android:orientation="vertical"
+                        android:id="@+id/idLayoutCadastroAlimento"
                         android:gravity="bottom">
 
                         <TextView
@@ -124,7 +125,8 @@
                             android:layout_height="wrap_content"
                             android:textAppearance="?android:attr/textAppearanceLarge"
                             android:text="@string/quantidadeAlimento"
-                            android:id="@+id/txtViewQuantidade" />
+                            android:id="@+id/txtViewQuantidade"
+                            android:layout_marginTop="5dp" />
 
                         <EditText
                             android:id="@+id/idQuantidade"
@@ -132,7 +134,53 @@
                             android:layout_height="wrap_content"
                             android:inputType="numberDecimal" />
 
+
+                        <RadioGroup
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:orientation="horizontal"
+                            android:layout_alignEnd="@+id/idQuantidade"
+                            android:id="@+id/idRdoGroupModal"
+                            android:layout_alignParentTop="false"
+                            android:layout_alignParentBottom="true"
+                            android:layout_marginTop="25dp">
+
+                            <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/txt_rdoBtn_Kg"
+                                android:id="@+id/rdoBtnKg"
+                                android:layout_marginRight="10dp"
+                                android:textStyle="bold" />
+
+                            <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/txt_rdoBtn_g"
+                                android:id="@+id/rdoBtnG"
+                                android:layout_marginRight="10dp"
+                                android:textStyle="bold" />
+
+                            <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/txt_rdoBtn_Litro"
+                                android:id="@+id/rdoBtnLitro"
+                                android:layout_marginRight="10dp"
+                                android:textStyle="bold" />
+
+                            <RadioButton
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/txt_rdoBtn_Unidade"
+                                android:id="@+id/rdoBtnUnidade"
+                                android:checked="true"
+                                android:textStyle="bold" />
+                        </RadioGroup>
+
+
                     </LinearLayout>
+
 
 
                     <Button

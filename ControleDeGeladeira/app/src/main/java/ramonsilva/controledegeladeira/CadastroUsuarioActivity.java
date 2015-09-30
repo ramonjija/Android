@@ -101,7 +101,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         }
 
 
-        ////////////////
     }
 
     protected void RecuperarListaDeAlimentos(String idUsuarioLogado){
@@ -207,7 +206,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                       @Override
                                                       public void done(List<ParseObject> list, ParseException e) {
                                                           if (e != null) {
-
+                                                            //TODO: Retornar para a main após cadastro bem sucedido
                                                               Toast.makeText(getApplicationContext(), "Um erro ocorreu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                               e.printStackTrace();
 
@@ -229,6 +228,9 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                                               Toast.makeText(getApplicationContext(), "Usuario cadastrado com sucesso", Toast.LENGTH_SHORT).show();
                                                                               rdoBtnSalvarUsuario.setEnabled(false);
                                                                               rdoBtnSalvarUsuario.setChecked(false);
+                                                                              rdoBtnLogarUsuario.setEnabled(false);
+                                                                              rdoBtnLogarUsuario.setChecked(false);
+                                                                              rdoBtnSalvarAmigos.setChecked(true);
                                                                               cadastroUsuario = false;
                                                                           }
                                                                       }
@@ -251,7 +253,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
                     txtNome.setText("");
                     txtSenha.setText("");
-
 
                 } catch (Exception ex) {
                     ex.getMessage();

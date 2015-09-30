@@ -6,7 +6,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.preference.Preference;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
@@ -18,6 +17,8 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TabHost;
 import android.widget.Toast;
 
@@ -29,7 +30,6 @@ import java.util.List;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -69,6 +69,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button botaoExcluirAmigo = null;
 
+    private RadioGroup rdoGroupModal = null;
+    private RadioButton rdoBtnKg = null;
+    private RadioButton rdoBtnG = null;
+    private RadioButton rdoBtnLitro = null;
+    private RadioButton rdoBtnUnidade = null;
+    private String tipo = "Unidades";
+
 
     protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
         JSONArray ListaAlimentosObtidos = null;//
@@ -95,8 +102,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
             JSONArray array = new JSONArray();
             JSONObject obj;
-        final String[] objId = new String[1];
-        final ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
+            final String[] objId = new String[1];
+            final ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
             final ParseQuery<ParseObject> query;
 
             for(Alimentos item : alimentos){
@@ -106,6 +113,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                     obj.put("nome", item.getNome());
                     //alimentosParse.put("nome", item.getNome());
                     obj.put("quantidade", item.getQuantidade());
+                    obj.put("tipo", item.getTipo());
+
                     //alimentosParse.put("quantidade", item.getQuantidade());
                     //alimentosParse.saveInBackground();
                     array.put(obj);
@@ -172,6 +181,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         if(!nomeAlimento.isEmpty() && !qntAlimento.isEmpty()) {
             alimento.setNome(nomeAlimento);
             alimento.setQuantidade(qntAlimento);
+            alimento.setTipo(tipo);
             adapter.add(alimento);
             nome.setText("");
             quantidade.setText("");
@@ -200,7 +210,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     }
 
-    protected void ExcluirLista(){
+    protected void ExcluirAlimentoLista(){
         if(alimentoSelecionado != null)
         {
 
@@ -208,6 +218,15 @@ public class MainActivity extends Activity implements View.OnClickListener{
             alimentoSelecionado = null;
         }
     }
+
+    protected void ExcluirAmigoLista(){
+        if(amigoSelecionado != null){
+
+            adapterAmigos.remove(amigoSelecionado);
+            amigoSelecionado = null;
+        }
+    }
+    //TODO: Criar metodo para salvar a lista (Atualizada) de amigos após exclusão
 
     protected void RecuperarListaDoJson(){
         try {
@@ -222,7 +241,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 alimento = new Alimentos();
                 alimento.setNome(obj.getString("nome"));
                 alimento.setQuantidade(obj.getString("quantidade"));
-
+                alimento.setTipo(obj.getString("tipo"));
                 alimentos.add(alimento);
 
             }
@@ -341,7 +360,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
             case R.id.idBtnExclude:
 
-                ExcluirLista();
+                ExcluirAlimentoLista();
 
                 break;
 
@@ -377,6 +396,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                     alimento = new Alimentos();
                                                     alimento.setNome(obj.getString("nome"));
                                                     alimento.setQuantidade(obj.getString("quantidade"));
+                                                    alimento.setTipo(obj.getString("tipo"));
                                                     alimentos.add(alimento);
                                                 } catch (JSONException e) {
                                                     e.printStackTrace();
@@ -414,6 +434,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 startActivity(cadastroActivity);
                 break;
 
+            case R.id.idBtnExcluirAmigo:
+
+                ExcluirAmigoLista();
+                break;
             default:
                 break;
         }
@@ -442,6 +466,28 @@ public class MainActivity extends Activity implements View.OnClickListener{
         descritor.setContent(R.id.idListViewAmigos);
         descritor.setIndicator("Lista de amigos");
         tab.addTab(descritor);
+
+        rdoBtnKg = (RadioButton)findViewById(R.id.rdoBtnKg);
+        rdoBtnG = (RadioButton)findViewById(R.id.rdoBtnG);
+        rdoBtnLitro = (RadioButton)findViewById(R.id.rdoBtnLitro);
+        rdoBtnUnidade = (RadioButton)findViewById(R.id.rdoBtnUnidade);
+
+        rdoGroupModal = (RadioGroup)findViewById(R.id.idRdoGroupModal);
+        rdoGroupModal.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                if(checkedId == R.id.rdoBtnKg){
+                    tipo = "Kilos";
+                }else if(checkedId == R.id.rdoBtnG){
+                    tipo = "Gramas";
+                }else if(checkedId == R.id.rdoBtnLitro){
+                    tipo = "Litros";
+                }else{
+                    tipo = "Unidades";
+                }
+
+            }
+        });
 
 
         //Inicio da configuracao do Parse
@@ -498,9 +544,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 amigoSelecionado = (Usuario)parent.getItemAtPosition(position);
             }
         });
-
-
-
 
 
         botaosalvarAlimento = (Button) findViewById(R.id.idBtnSalvar);
