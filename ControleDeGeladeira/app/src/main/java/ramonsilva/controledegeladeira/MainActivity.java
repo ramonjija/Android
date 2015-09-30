@@ -69,114 +69,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private Button botaoExcluirAmigo = null;
 
-    @Override
-    public void onClick(View v) {
-        switch(v.getId()) {
-            case R.id.idBtnSalvar:
-
-                InserirAlimento();
-
-                break;
-
-            case R.id.idBtnSalvarLista:
-
-                SalvarLista();
-
-                break;
-
-            case R.id.idBtnMinus:
-
-                AlterarQuantidade(-1);
-
-                break;
-
-            case R.id.idBtnPlus:
-
-                AlterarQuantidade(+1);
-
-                break;
-
-            case R.id.idBtnExclude:
-
-                ExcluirLista();
-
-                break;
-
-            case R.id.idBtnObterListaAmigo:
-
-                new AlertDialog.Builder(this)
-                        .setMessage("Você tem certeza que deseja substituir sua lista?")
-                        .setCancelable(false)
-                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-
-                            public void onClick(DialogInterface dialog, int id) {
-                               /**/
-
-                                JSONArray arrayAlimentos;
-                                if (amigoSelecionado != null) {
-                                    String message = "Lista Atualizada com sucesso: " + amigoSelecionado.getNome();
-                                    String idListaUsuario = null;
-                                    try {
-                                        idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
-                                    } catch (ParseException e) {
-                                        e.printStackTrace();
-                                    }
-                                    if (idListaUsuario != null) {
-                                        //String idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
-                                        try {
-                                            arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
-                                            alimentos.clear();
-                                            JSONObject obj;
-                                            Alimentos alimento;
-                                            for (int i = 0; i < arrayAlimentos.length(); i++) {
-                                                try {
-                                                    obj = arrayAlimentos.getJSONObject(i);
-                                                    alimento = new Alimentos();
-                                                    alimento.setNome(obj.getString("nome"));
-                                                    alimento.setQuantidade(obj.getString("quantidade"));
-                                                    alimentos.add(alimento);
-                                                } catch (JSONException e) {
-                                                    e.printStackTrace();
-                                                }
-                                            }
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-
-                                    } else {
-
-                                        message = "O usuario " + amigoSelecionado.getNome() + " nao possui lista!";
-
-                                    }
-                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-
-                                }
-
-                                /**/
-
-                            }
-                        })
-                        .setNegativeButton("Não", null)
-                        .show();
-
-                break;
-
-            case R.id.idBtnCadastroUsuario:
-
-                Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
-                CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
-                startActivity(cadastroActivity);
-                this.finish();
-
-                break;
-
-            default:
-                break;
-        }
-
-    }
 
     protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
         JSONArray ListaAlimentosObtidos = null;//
@@ -376,6 +268,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         {
             //CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
             Intent i = new Intent(this, CadastroUsuarioActivity.class);
+            finish();
             startActivity(i);
             Log.i("UsuarioCadastrado","Usuario não cadastrado. Iniciando o cadastro");
         }
@@ -384,7 +277,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
-    private void InitParse(){
+   /* private void InitParse(){
 
         Bundle extras = getIntent().getExtras();
         if (extras == null) {
@@ -400,7 +293,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             //String value = extras.getString("ParseIniciado");
         }
     }
-
+    */
     private class AlimentoAdapter extends ArrayAdapter{
             public AlimentoAdapter(){
                 super(MainActivity.this, android.R.layout.simple_list_item_1, alimentos);
@@ -411,6 +304,120 @@ public class MainActivity extends Activity implements View.OnClickListener{
         public AmigosAdapter(){
             super(MainActivity.this, android.R.layout.simple_list_item_1, amigos);
         }
+    }
+
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+        this.finish();
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch(v.getId()) {
+            case R.id.idBtnSalvar:
+
+                InserirAlimento();
+
+                break;
+
+            case R.id.idBtnSalvarLista:
+
+                SalvarLista();
+
+                break;
+
+            case R.id.idBtnMinus:
+
+                AlterarQuantidade(-1);
+
+                break;
+
+            case R.id.idBtnPlus:
+
+                AlterarQuantidade(+1);
+
+                break;
+
+            case R.id.idBtnExclude:
+
+                ExcluirLista();
+
+                break;
+
+            case R.id.idBtnObterListaAmigo:
+
+                new AlertDialog.Builder(this)
+                        .setMessage("Você tem certeza que deseja substituir sua lista?")
+                        .setCancelable(false)
+                        .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+
+                            public void onClick(DialogInterface dialog, int id) {
+                               /**/
+
+                                JSONArray arrayAlimentos;
+                                if (amigoSelecionado != null) {
+                                    String message = "Lista Atualizada com sucesso: " + amigoSelecionado.getNome();
+                                    String idListaUsuario = null;
+                                    try {
+                                        idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
+                                    } catch (ParseException e) {
+                                        e.printStackTrace();
+                                    }
+                                    if (idListaUsuario != null) {
+                                        //String idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
+                                        try {
+                                            arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
+                                            alimentos.clear();
+                                            JSONObject obj;
+                                            Alimentos alimento;
+                                            for (int i = 0; i < arrayAlimentos.length(); i++) {
+                                                try {
+                                                    obj = arrayAlimentos.getJSONObject(i);
+                                                    alimento = new Alimentos();
+                                                    alimento.setNome(obj.getString("nome"));
+                                                    alimento.setQuantidade(obj.getString("quantidade"));
+                                                    alimentos.add(alimento);
+                                                } catch (JSONException e) {
+                                                    e.printStackTrace();
+                                                }
+                                            }
+                                        } catch (ParseException e) {
+                                            e.printStackTrace();
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+
+                                    } else {
+
+                                        message = "O usuario " + amigoSelecionado.getNome() + " nao possui lista!";
+
+                                    }
+                                    Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+
+                                }
+
+                                /**/
+
+                            }
+                        })
+                        .setNegativeButton("Não", null)
+                        .show();
+
+                break;
+
+            case R.id.idBtnCadastroUsuario:
+
+                Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
+                CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
+                finish();
+                startActivity(cadastroActivity);
+                break;
+
+            default:
+                break;
+        }
+
     }
 
     @Override
@@ -441,7 +448,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
         //Parse.enableLocalDatastore(this);
         //Parse.initialize(this, "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
 
-        InitParse();
+        //InitParse();
 
 
         //Verifica se o usuario foi cadastrado
@@ -572,7 +579,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
         );
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
@@ -597,9 +603,10 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     @Override
     protected void onPause() {
-        //SalvarLista();
         super.onPause();
     }
+
 }
+
 
 

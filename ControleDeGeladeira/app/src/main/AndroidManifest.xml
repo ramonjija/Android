@@ -19,6 +19,7 @@
     <uses-permission android:name="com.example.gcm.permission.C2D_MESSAGE" />
 
     <application
+        android:name=".App"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_geladeira_verde"
         android:label="@string/app_name"

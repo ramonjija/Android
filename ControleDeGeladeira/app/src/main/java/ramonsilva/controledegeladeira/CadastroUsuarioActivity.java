@@ -48,6 +48,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     private RadioButton rdoBtnLogarUsuario;
     private String mensagem = "Aguarde...";
     private String idUsuarioLogado = null;
+    private boolean cadastrouAmigo = false;
 
 
     private void PassarParametroEiniciarActivity(Intent i){
@@ -177,234 +178,227 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+
+        //Intent intent = new Intent(this, MainActivity.class);
+        //startActivity(intent);
+        if(!rdoBtnLogarUsuario.isEnabled() && !rdoBtnSalvarUsuario.isEnabled()){
+                Intent i = new Intent(this, MainActivity.class);
+                finish();
+                startActivity(i);
+                super.onBackPressed();
+
+        }
     }
 
     @Override
     public void onClick(View v) {
-        mensagem = "Aguarde...";
         EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
-        nome = txtNome.getText().toString();
-
         EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
+        nome = txtNome.getText().toString();
         senha = txtSenha.getText().toString();
+        if(!nome.equals("") && !senha.equals("")) {
+            mensagem = "Aguarde...";
+            final Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            if (rdoBtnSalvarUsuario.isChecked()) {
+                try {
+                    ParseQuery<ParseObject> queryUsuario = ParseQuery.getQuery("Usuario");
+                    queryUsuario.whereEqualTo("nome", nome);
+                    queryUsuario.findInBackground(new FindCallback<ParseObject>() {
+                                                      @Override
+                                                      public void done(List<ParseObject> list, ParseException e) {
+                                                          if (e != null) {
 
-        final Intent i = new Intent(getApplicationContext(), MainActivity.class);
+                                                              Toast.makeText(getApplicationContext(), "Um erro ocorreu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                                                              e.printStackTrace();
 
+                                                              //Toast.makeText(getApplicationContext(), "Usuario ja cadastrado", Toast.LENGTH_SHORT).show();
 
-        if (rdoBtnSalvarUsuario.isChecked()) {
-            try {
-                ParseQuery<ParseObject> queryUsuario = ParseQuery.getQuery("Usuario");
-                queryUsuario.whereEqualTo("nome", nome);
-                queryUsuario.findInBackground(new FindCallback<ParseObject>() {
-                                                  @Override
-                                                  public void done(List<ParseObject> list, ParseException e) {
-                                                      if (e != null) {
+                                                          } else if (list.isEmpty()) {
+                                                              //Usuario não cadastrado
+                                                              final ParseObject usuarioCadastrado = new ParseObject("Usuario");
 
-                                                          Toast.makeText(getApplicationContext(), "Um erro ocorreu: "+ e.getMessage(), Toast.LENGTH_SHORT).show();
-                                                          e.printStackTrace();
-
-                                                          //Toast.makeText(getApplicationContext(), "Usuario ja cadastrado", Toast.LENGTH_SHORT).show();
-
-                                                      } else if (list.isEmpty()) {
-                                                          //Usuario não cadastrado
-                                                          final ParseObject usuarioCadastrado = new ParseObject("Usuario");
-
-                                                          usuarioCadastrado.put("nome", nome);
-                                                          usuarioCadastrado.put("senha", senha);
-                                                          //usuarioCadastrado.saveInBackground();
-                                                          usuarioCadastrado.saveInBackground(
-                                                                  new SaveCallback() {
-                                                                      @Override
-                                                                      public void done(ParseException e) {
-                                                                          prefsEditor.putString("idUsuario", usuarioCadastrado.getObjectId());
-                                                                          prefsEditor.commit();
-                                                                          Toast.makeText(getApplicationContext(), "Usuario cadastrado com sucesso", Toast.LENGTH_SHORT).show();
-                                                                          rdoBtnSalvarUsuario.setEnabled(false);
-                                                                          rdoBtnSalvarUsuario.setChecked(false);
-                                                                          cadastroUsuario = false;
+                                                              usuarioCadastrado.put("nome", nome);
+                                                              usuarioCadastrado.put("senha", senha);
+                                                              //usuarioCadastrado.saveInBackground();
+                                                              usuarioCadastrado.saveInBackground(
+                                                                      new SaveCallback() {
+                                                                          @Override
+                                                                          public void done(ParseException e) {
+                                                                              prefsEditor.putString("idUsuario", usuarioCadastrado.getObjectId());
+                                                                              prefsEditor.commit();
+                                                                              Toast.makeText(getApplicationContext(), "Usuario cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+                                                                              rdoBtnSalvarUsuario.setEnabled(false);
+                                                                              rdoBtnSalvarUsuario.setChecked(false);
+                                                                              cadastroUsuario = false;
+                                                                          }
                                                                       }
-                                                                  }
 
-                                                          );
-                                                      } else {
-                                                          //Usuario já cadastrado
-                                                          String idUsuario = null;
-                                                          for (ParseObject objeto : list) {
-                                                              idUsuario = objeto.getObjectId();
+                                                              );
+                                                          } else {
+                                                              //Usuario já cadastrado
+                                                              String idUsuario = null;
+                                                              for (ParseObject objeto : list) {
+                                                                  idUsuario = objeto.getObjectId();
+                                                              }
+                                                              prefsEditor.putString("idUsuario", idUsuario).commit();
+                                                              Toast.makeText(getApplicationContext(), "Usuario ja cadastrado", Toast.LENGTH_SHORT).show();
                                                           }
-                                                          prefsEditor.putString("idUsuario", idUsuario).commit();
-                                                          Toast.makeText(getApplicationContext(), "Usuario ja cadastrado", Toast.LENGTH_SHORT).show();
+                                                          //rdoBtnSalvarUsuario.setEnabled(false);
+
                                                       }
-                                                      //rdoBtnSalvarUsuario.setEnabled(false);
-
                                                   }
-                                              }
-                );
+                    );
 
-                txtNome.setText("");
-                txtSenha.setText("");
+                    txtNome.setText("");
+                    txtSenha.setText("");
 
 
-            } catch (Exception ex) {
-                ex.getMessage();
-                Toast.makeText(getApplicationContext(), "Nao foi possivel cadastrar esse usuario", Toast.LENGTH_SHORT).show();
-            }
+                } catch (Exception ex) {
+                    ex.getMessage();
+                    Toast.makeText(getApplicationContext(), "Nao foi possivel cadastrar esse usuario", Toast.LENGTH_SHORT).show();
+                }
 
-        } else if(rdoBtnSalvarAmigos.isChecked()){
-            usuario = new Usuario(nome, senha);
-            if (listaDeUsuarios == null) {
-                listaDeUsuarios = new ArrayList<Usuario>();
-            }
-            if (!VerificarSeAmigoEstaCadastrado(listaDeUsuarios, nome)) {
-                listaDeUsuarios.add(usuario);
+            } else if (rdoBtnSalvarAmigos.isChecked()) {
+                usuario = new Usuario(nome, senha);
+                if (listaDeUsuarios == null) {
+                    listaDeUsuarios = new ArrayList<Usuario>();
+                }
+                if (!VerificarSeAmigoEstaCadastrado(listaDeUsuarios, nome)) {
+                    listaDeUsuarios.add(usuario);
 
-                //Passo 1:
-                final ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
-                queryAmigo.whereEqualTo("nome", nome);
-                queryAmigo.whereEqualTo("senha", senha);
+                    //Passo 1:
+                    final ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
+                    queryAmigo.whereEqualTo("nome", nome);
+                    queryAmigo.whereEqualTo("senha", senha);
 
-                queryAmigo.findInBackground(new FindCallback<ParseObject>() {
-                    @Override
-                    public void done(final List<ParseObject> list, ParseException e) {
-                        if (e != null) {
-                            Log.i("CadastroAmigo", "Ocorreu um erro no cadastro de amigo " + e.getMessage());
-                            e.printStackTrace();
-                        } else if (list.isEmpty()) {
-                            Toast.makeText(getApplicationContext(), "Amigo não encontrado", Toast.LENGTH_SHORT).show();
+                    queryAmigo.findInBackground(new FindCallback<ParseObject>() {
+                        @Override
+                        public void done(final List<ParseObject> list, ParseException e) {
+                            if (e != null) {
+                                Log.i("CadastroAmigo", "Ocorreu um erro no cadastro de amigo " + e.getMessage());
+                                e.printStackTrace();
+                            } else if (list.isEmpty()) {
+                                Toast.makeText(getApplicationContext(), "Amigo não encontrado", Toast.LENGTH_SHORT).show();
 
-                        } else {
-                            //Encontrou o amigo
-                            //Passo 2:
-                            SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
-                            SharedPreferences.Editor prefsEditor = mPrefs.edit();
-
-                            JSONArray array = new JSONArray();
-                            JSONObject obj;
-
-                            for (Usuario usuario : listaDeUsuarios) {
-                                obj = new JSONObject();
-                                try {
-                                    obj.put("nomeUsuario", usuario.getNome());
-                                    obj.put("senhaUsuario", usuario.getSenha());
-
-                                    array.put(obj);
-                                } catch (JSONException je) {
-                                    je.printStackTrace();
-                                }
-                            }
-                            final String arrayStr = array.toString();//VERIFICAR
-                            prefsEditor.putString("usuarios", arrayStr).commit();
-
-                            //Passo 2.1.1 : Verificar se existe lista de amigos
-
-                            if (idListaAmigos.getString("idListaAmigo", "ListaInexistente").equals("ListaInexistente")) {
-
-                                final ParseObject listaDeAmigos = new ParseObject("ListaDeAmigos");
-
-                                listaDeAmigos.put("IdUsuario", idUsuario.getString("idUsuario", "Inexistente"));// idUsuario.getString("IdUsuario", "Inexistente"));
-                                listaDeAmigos.put("Dados", arrayStr);
-                                listaDeAmigos.saveInBackground(new SaveCallback() {
-                                    @Override
-                                    public void done(ParseException e) {
-                                        if (e == null) {
-                                            prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
-                                            prefsEditorListaAmigos.commit();
-                                            Toast.makeText(getApplicationContext(), "Amigo cadastrado com sucesso", Toast.LENGTH_SHORT).show();
-                                            PassarParametroEiniciarActivity(i);
-
-                                        }
-                                    }
-                                });
                             } else {
+                                //Encontrou o amigo
+                                //Passo 2:
+                                SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+                                SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
-                                //Lista Existe dar update
+                                JSONArray array = new JSONArray();
+                                JSONObject obj;
+
+                                for (Usuario usuario : listaDeUsuarios) {
+                                    obj = new JSONObject();
+                                    try {
+                                        obj.put("nomeUsuario", usuario.getNome());
+                                        obj.put("senhaUsuario", usuario.getSenha());
+
+                                        array.put(obj);
+                                    } catch (JSONException je) {
+                                        je.printStackTrace();
+                                    }
+                                }
+                                final String arrayStr = array.toString();//VERIFICAR
+                                prefsEditor.putString("usuarios", arrayStr).commit();
+
+                                //Passo 2.1.1 : Verificar se existe lista de amigos
+
+                                if (idListaAmigos.getString("idListaAmigo", "ListaInexistente").equals("ListaInexistente")) {
+
+                                    final ParseObject listaDeAmigos = new ParseObject("ListaDeAmigos");
+
+                                    listaDeAmigos.put("IdUsuario", idUsuario.getString("idUsuario", "Inexistente"));// idUsuario.getString("IdUsuario", "Inexistente"));
+                                    listaDeAmigos.put("Dados", arrayStr);
+                                    listaDeAmigos.saveInBackground(new SaveCallback() {
+                                        @Override
+                                        public void done(ParseException e) {
+                                            if (e == null) {
+                                                prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
+                                                prefsEditorListaAmigos.commit();
+                                                Toast.makeText(getApplicationContext(), "Amigo cadastrado com sucesso", Toast.LENGTH_SHORT).show();
+                                                PassarParametroEiniciarActivity(i);
+
+                                            }
+                                        }
+                                    });
+                                } else {
+
+                                    //Lista Existe dar update
                             /*
                             String listObjectId = null;
                             for (ParseObject objetos : list) {
                                 listObjectId = objetos.getObjectId();
                             }
                             */
-                                String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
-                                ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
-                                queryAmigoUpdate.getInBackground(idListaAmigo, new GetCallback<ParseObject>() {
-                                    @Override
-                                    public void done(ParseObject parseObject, ParseException e) {
-                                        if (e == null) {
-                                            parseObject.put("Dados", arrayStr);
-                                            parseObject.saveInBackground();
-                                            Toast.makeText(getApplicationContext(), "Lista de amigos atualizada com sucesso", Toast.LENGTH_SHORT).show();
-                                            PassarParametroEiniciarActivity(i);
+                                    String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
+                                    ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
+                                    queryAmigoUpdate.getInBackground(idListaAmigo, new GetCallback<ParseObject>() {
+                                        @Override
+                                        public void done(ParseObject parseObject, ParseException e) {
+                                            if (e == null) {
+                                                parseObject.put("Dados", arrayStr);
+                                                parseObject.saveInBackground();
+                                                Toast.makeText(getApplicationContext(), "Lista de amigos atualizada com sucesso", Toast.LENGTH_SHORT).show();
+                                                PassarParametroEiniciarActivity(i);
+                                            }
                                         }
-                                    }
-                                });
+                                    });
+
+                                }
+
 
                             }
-
-
                         }
-                    }
-                });
+                    });
 
 
-            }else{
-                mensagem = "Amigo já cadastrado!";
-            }
-        }else if(rdoBtnLogarUsuario.isChecked()){
-            ParseQuery<ParseObject> queryLogin = ParseQuery.getQuery("Usuario");
-            queryLogin.whereEqualTo("nome",nome);
-            queryLogin.whereEqualTo("senha",senha);
-            List<ParseObject> objUsuario = null;
-            try {
-                objUsuario = queryLogin.find();
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-            for(ParseObject obj : objUsuario){
-                idUsuarioLogado = obj.getObjectId();
-
-            }
-            if(idUsuarioLogado != null) {
-                String idListaAlimento = null;
-                prefsEditor.putString("idUsuario", idUsuarioLogado);
-                prefsEditor.commit();
-                Toast.makeText(getApplicationContext(), "Logado! ;)", Toast.LENGTH_SHORT).show();
-
-                RecuperarListaAmigosLogado(idUsuarioLogado);
-
-                //Recuperar IdDaListaDeAlimentos
-
-                RecuperarListaDeAlimentos(idUsuarioLogado);
-                //
-
-               /* try {
-                    MainActivity.ObtemListaAlimentosUsuario(idAlimentosListaAmigo); E
+                } else {
+                    mensagem = "Amigo já cadastrado!";
+                }
+            } else if (rdoBtnLogarUsuario.isChecked()) {
+                ParseQuery<ParseObject> queryLogin = ParseQuery.getQuery("Usuario");
+                queryLogin.whereEqualTo("nome", nome);
+                queryLogin.whereEqualTo("senha", senha);
+                List<ParseObject> objUsuario = null;
+                try {
+                    objUsuario = queryLogin.find();
                 } catch (ParseException e) {
                     e.printStackTrace();
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }*/ //Errado isso so pega a lista do amigo, é necessario obter a lista do usuario e carregá-la
+                }
+                for (ParseObject obj : objUsuario) {
+                    idUsuarioLogado = obj.getObjectId();
 
-                rdoBtnSalvarUsuario.setEnabled(false);
-                rdoBtnSalvarUsuario.setChecked(false);
-                rdoBtnLogarUsuario.setEnabled(false);
-                rdoBtnLogarUsuario.setChecked(false);
-                rdoBtnSalvarAmigos.setChecked(true);
-                cadastroUsuario = false;
-                logarUsuario = false;
+                }
+                if (idUsuarioLogado != null) {
+                    String idListaAlimento = null;
+                    prefsEditor.putString("idUsuario", idUsuarioLogado);
+                    prefsEditor.commit();
+                    mensagem = "Logado! ;)";
+
+                    RecuperarListaAmigosLogado(idUsuarioLogado);
+                    RecuperarListaDeAlimentos(idUsuarioLogado);
+
+                    rdoBtnSalvarUsuario.setEnabled(false);
+                    rdoBtnSalvarUsuario.setChecked(false);
+                    rdoBtnLogarUsuario.setEnabled(false);
+                    rdoBtnLogarUsuario.setChecked(false);
+                    rdoBtnSalvarAmigos.setChecked(true);
+                    cadastroUsuario = false;
+                    logarUsuario = false;
+                    //objUsuario = null;
+                } else {
+                    mensagem = "Nome ou Senha Incorretos";
+                }
             }
-            else{
-               mensagem = "Login ou Senha Incorretos";
-            }
+        }else{
+            mensagem = "Nome e Senha devem ser preenchidos";
         }
         txtNome.setText("");
         txtSenha.setText("");
         Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
 
-       //Intent i = new Intent(v.getContext(), MainActivity.class);
-       //startActivity(i);
     }
 
     @Override
