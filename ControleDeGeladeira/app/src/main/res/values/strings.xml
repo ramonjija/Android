@@ -3,22 +3,26 @@
 
     <string name="action_settings">Settings</string>
     <string name="titutoApp">Lista de Alimentos</string>
-    <string name="nome">Nome: </string>
+    <string name="nome">Nome do Alimento: </string>
     <string name="quantidadeAlimento">Quantidade: </string>
-    <string name="btnSalvar">Salvar</string>
-    <string name="cadastro">Cadastrar</string>
+    <string name="btnSalvar">Salvar Lista</string>
+    <string name="btnAdicionarAlimento">Adicionar à Lista</string>
+    <string name="cadastro">Adicionar Amigo</string>
     <string name="txtBtnPlus">+</string>
-    <string name="txtBtnExclude">Excluir</string>
+    <string name="txtBtnExclude">Excluir Alimento</string>
     <string name="txtBtnMinus">-</string>
-    <string name="obterListaAmigo">Obter Lista</string>
+    <string name="obterListaAmigo">Alimentos</string>
     <string name="title_activity_cadastro_usuario">Cadastro de Usuarios</string>
     <string name="Senha">Senha:</string>
     <string name="textoCadastroUsuario">Me Cadastrar</string>
     <string name="textoCadastrarAmigo">Cadastrar Amigo</string>
-    <string name="prefKeyResetQuests">resetQuests</string>
     <string name="logar_texto">Me Logar</string>
     <string name="txt_rdoBtn_Kg">kg</string>
     <string name="txt_rdoBtn_g">g</string>
     <string name="txt_rdoBtn_Litro">Litro</string>
     <string name="txt_rdoBtn_Unidade">Unidade</string>
+    <string name="txt_Btn_Logar">Logar</string>
+    <string name="lbl_txt_nomeGenerico">Nome:</string>
+    <string name="txt_btn_Voltar">Voltar</string>
+    <string name="txt_Btn_ExcluirAmigo">Excluir</string>
 </resources>

@@ -53,41 +53,6 @@ public class Usuario {
          String idListaUsuario = null;
          String idUsuario = null;
 
-        /*ParseQuery<ParseObject> queryUsuario = ParseQuery.getQuery("Usuario");
-        queryUsuario.whereEqualTo("nome", nome);
-
-        queryUsuario.findInBackground(new FindCallback<ParseObject>() {
-            @Override
-            public void done(List<ParseObject> list, ParseException e) {
-                if (e == null) {
-                    //sem problemas
-                    if (!list.isEmpty()) {
-                        for (ParseObject obj : list) {
-                            idUsuario[0] = obj.getObjectId().toString();
-                        }
-                        ParseQuery<ParseObject> queryLista = ParseQuery.getQuery("ListaDeAlimentos");
-                        queryLista.whereEqualTo("idUsuario", idUsuario[0]);
-                        queryLista.findInBackground(new FindCallback<ParseObject>() {
-                            @Override
-                            public void done(List<ParseObject> list, ParseException e) {
-                                if (e == null) {
-                                    //sem problemas
-                                    if (!list.isEmpty()) {
-                                        for (ParseObject obj : list) {
-                                            idListaUsuario[0] = obj.getObjectId();
-                                        }
-                                    }
-                                } else {
-                                    idListaUsuario[0] = "Lista Vazia";
-                                }
-                            }
-                        });
-
-                    }
-                }
-            }
-        });
-        */
         //TODO: Exemplo de metodo sincrono
         ParseQuery<ParseObject> queryUsuario = ParseQuery.getQuery("Usuario");
         queryUsuario.whereEqualTo("nome", nome);

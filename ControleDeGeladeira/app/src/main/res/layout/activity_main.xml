@@ -11,7 +11,10 @@
             <TabWidget
                 android:id="@android:id/tabs"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:textAlignment="center"
+                android:baselineAligned="false" />
 
             <FrameLayout
                 android:id="@android:id/tabcontent"
@@ -19,6 +22,7 @@
                 android:layout_height="match_parent" >
 
                 <RelativeLayout
+                    style="?android:attr/buttonBarStyle"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:id="@+id/idRelLayLista">
@@ -37,13 +41,15 @@
                             android:layout_height="271dp"
                             android:choiceMode="singleChoice"
                             android:listSelector="@drawable/selected"
+                            android:background="@android:color/transparent"
                             android:clickable="true"
-                            android:layout_weight="0.56" />
+                            android:layout_weight="0.56"
+                            android:headerDividersEnabled="true" />
 
                     </LinearLayout>
 
                     <Button
-                        style="?android:attr/buttonStyleSmall"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txtBtnMinus"
@@ -51,10 +57,11 @@
                         android:layout_alignParentBottom="true"
                         android:layout_toLeftOf="@+id/idBtnExclude"
                         android:layout_toStartOf="@+id/idBtnExclude"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        android:textSize="30sp" />
 
                     <Button
-                        style="?android:attr/buttonStyleSmall"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txtBtnExclude"
@@ -64,7 +71,7 @@
                         android:visibility="visible" />
 
                     <Button
-                        style="?android:attr/buttonStyleSmall"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/btnSalvar"
@@ -81,7 +88,7 @@
                         android:layout_above="@+id/idBtnExclude" />
 
                     <Button
-                        style="?android:attr/buttonStyleSmall"
+                        style="?android:attr/buttonBarButtonStyle"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="@string/txtBtnPlus"
@@ -89,12 +96,14 @@
                         android:layout_alignParentBottom="true"
                         android:layout_toRightOf="@+id/idBtnExclude"
                         android:layout_toEndOf="@+id/idBtnExclude"
-                        android:visibility="visible" />
+                        android:visibility="visible"
+                        android:textSize="25sp" />
 
                 </RelativeLayout>
 
 
                 <RelativeLayout
+                    style="?android:attr/buttonBarStyle"
                     android:id="@+id/Cadastro"
                     android:layout_width="fill_parent"
                     android:layout_height="wrap_content">
@@ -184,11 +193,12 @@
 
 
                     <Button
+                        style="?android:attr/buttonBarButtonStyle"
                         android:id="@+id/idBtnSalvar"
                         android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:text="@string/btnSalvar" />
+                        android:text="@string/btnAdicionarAlimento" />
                 </RelativeLayout>
 
                 <RelativeLayout
@@ -216,41 +226,45 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:id="@+id/idTxtViewListaAmigo" />
-
-                    <Button
-                    android:id="@+id/idBtnExcluirAmigo"
+                    <LinearLayout
+                        style="?android:attr/buttonBarStyle"
                         android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignBottom="@+id/idBtnCadastroUsuario"
-                        android:text="Excluir"
-                        android:gravity="center_horizontal"
-                        android:visibility="invisible"/>
-                        />
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="@string/cadastro"
-                        android:id="@+id/idBtnCadastroUsuario"
-
-                        android:layout_alignParentTop="false"
-                        android:layout_gravity="center_horizontal"
-                        android:layout_alignParentBottom="false"
-                        android:layout_alignParentLeft="false"
-                        android:layout_alignParentRight="false"
-                        android:layout_alignWithParentIfMissing="false"
-                        android:layout_centerHorizontal="true"
-                        android:layout_above="@+id/idBtnObterListaAmigo"
-                        android:visibility="invisible"/>
-
-
-                    <Button
-                        android:id="@+id/idBtnObterListaAmigo"
-                        android:layout_width="fill_parent"
                         android:layout_height="wrap_content"
                         android:layout_alignParentBottom="true"
-                        android:text="@string/obterListaAmigo"
-                        android:visibility="invisible"/>
+                        android:orientation="horizontal"
+
+                        android:layout_centerHorizontal="true"
+                        android:baselineAligned="true">
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/cadastro"
+                            android:id="@+id/idBtnCadastroUsuario"
+                            android:visibility="invisible"
+                            />
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:id="@+id/idBtnExcluirAmigo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txt_Btn_ExcluirAmigo"
+                            android:visibility="invisible"/>
+                        />
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:id="@+id/idBtnObterListaAmigo"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/obterListaAmigo"
+                            android:visibility="invisible"
+                            android:layout_gravity="bottom"
+                            android:elegantTextHeight="false" />
+
+                    </LinearLayout>
+
 
                 </RelativeLayout>
 

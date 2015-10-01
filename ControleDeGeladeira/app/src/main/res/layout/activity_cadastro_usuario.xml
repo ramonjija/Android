@@ -4,6 +4,7 @@
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
+    style="?android:attr/buttonBarStyle"
     tools:context="ramonsilva.controledegeladeira.CadastroUsuarioActivity">
 
     <EditText
@@ -37,7 +38,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="@string/nome" />
+        android:text="@string/lbl_txt_nomeGenerico" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -53,11 +54,11 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/btnSalvar"
+        android:text="@string/txt_Btn_Logar"
         android:id="@+id/idBtnSalvarUsuario"
-        android:layout_alignParentBottom="true"
+        android:layout_above="@+id/idBtnVoltar"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="35dp" />
+        style="?android:attr/buttonBarButtonStyle"/>
 
     <RadioGroup
         android:layout_width="match_parent"
@@ -74,33 +75,7 @@
         android:layout_alignStart="@+id/idBtnSalvarUsuario"
         android:layout_below="@+id/idEditTextSenhaUsuario"
         android:gravity="center">
-        <!--android:layout_toLeftOf="@+id/idRadBtnCadastroAmigo"
-        android:layout_toStartOf="@+id/idRadBtnCadastroAmigo"-->
 
-
-        <!--<RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/textoCadastroUsuario"
-                android:id="@+id/idRadBtnUsuario"
-                android:layout_alignTop="@+id/idRadBtnCadastroAmigo"
-                android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
-
-            <RadioButton
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/textoCadastrarAmigo"
-                android:id="@+id/idRadBtnCadastroAmigo"
-                android:layout_centerVertical="true"
-                android:layout_alignParentRight="true"
-                android:layout_alignParentEnd="true" />
-        </RelativeLayout>
--->
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -122,5 +97,16 @@
             android:id="@+id/idRadBtnCadastroAmigo"
             android:layout_gravity="center_vertical" />
     </RadioGroup>
+
+    <Button
+        style="?android:attr/buttonBarButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Voltar"
+        android:id="@+id/idBtnVoltar"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:visibility="invisible"
+        android:clickable="false" />
 
 </RelativeLayout>
