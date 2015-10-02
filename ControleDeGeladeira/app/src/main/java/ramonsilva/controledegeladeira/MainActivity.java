@@ -1,19 +1,16 @@
 package ramonsilva.controledegeladeira;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.graphics.Color;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -34,9 +31,12 @@ import java.util.List;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
+import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
+
+import android.os.Handler;
 
 
 
@@ -80,8 +80,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private RadioButton rdoBtnUnidade = null;
     private String tipo = "Unidades";
 
-
     private ListView lista = null;
+
+    private String idUsuario = null;
 
 
     protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
@@ -98,11 +99,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     protected void SalvarLista(final boolean mostraMsg){
 
-            //SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
-            //SharedPreferences de Alimentos
+
             SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
             SharedPreferences.Editor prefsEditor = mPrefs.edit();
-            //SharedPreferences de Usuario
             SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
             SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
 
@@ -114,71 +113,124 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
             for(Alimentos item : alimentos){
                 obj = new JSONObject();
-                //alimentosParse = new ParseObject("Alimentos");
                 try {
                     obj.put("nome", item.getNome());
-                    //alimentosParse.put("nome", item.getNome());
                     obj.put("quantidade", item.getQuantidade());
                     obj.put("tipo", item.getTipo());
-
-                    //alimentosParse.put("quantidade", item.getQuantidade());
-                    //alimentosParse.saveInBackground();
                     array.put(obj);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
             final String arrayStr = array.toString();
-        //
-        //Parse
-            final String idUsuario = idUsuarioPref.getString("idUsuario","Inexistente");
+
+            final String idUsuario = idUsuarioPref.getString("idUsuario", "Inexistente");
+            //idUsuario = idUsuarioPref.getString("idUsuario","Inexistente");
+
+            //Parse
 
             query = ParseQuery.getQuery("ListaDeAlimentos");
-            //query.whereEqualTo("IdUsuario", "Xn9ZXg3qcu");
             query.whereEqualTo("IdUsuario", idUsuario);
 
             query.findInBackground(new FindCallback<ParseObject>() {
                 @Override
                 public void done(List<ParseObject> list, ParseException e) {
-                    if(e != null) {
+                    if (e != null) {
                         e.printStackTrace();
-                    }
-                    else if(list.isEmpty()){
-                            //Lista de alimentos não encontrada
-                            //alimentosParse = new ParseObject("ListaDeAlimentos");
-                            alimentosParse.put("Alimentos", arrayStr);
-                            alimentosParse.put("IdUsuario", idUsuario);
-                            //alimentosParse.put("IdUsuario", "Xn9ZXg3qcu");
-                            alimentosParse.saveInBackground();
-                        if(mostraMsg) {
+                    } else if (list.isEmpty()) {
+
+                        alimentosParse.put("Alimentos", arrayStr);
+                        alimentosParse.put("IdUsuario", idUsuario);
+                        alimentosParse.saveInBackground();
+                        if (mostraMsg) {
                             Toast.makeText(getApplicationContext(), "Lista salva", Toast.LENGTH_SHORT).show();
                         }
+                    } else {
+                        String objectId = null;
+                        for (ParseObject objetos : list) {
+                            objectId = objetos.getObjectId();
                         }
-                        else{
-                            //Lista de alimentos encontrada
-                            String objectId = null;
-                            for(ParseObject objetos : list){
-                                objectId = objetos.getObjectId();
-                            }
 
-                            query.getInBackground(objectId, new GetCallback<ParseObject>() {
-                                @Override
-                                public void done(ParseObject parseObject, ParseException e) {
-                                    if(e == null){
-                                        parseObject.put("Alimentos", arrayStr);
-                                        parseObject.saveInBackground();
-                                        if(mostraMsg) {
-                                            Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
-                                        }
+                        query.getInBackground(objectId, new GetCallback<ParseObject>() {
+                            @Override
+                            public void done(ParseObject parseObject, ParseException e) {
+                                if (e == null) {
+                                    parseObject.put("Alimentos", arrayStr);
+                                    parseObject.saveInBackground();
+                                    if (mostraMsg) {
+                                        Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
                                     }
                                 }
-                            });
-                        }
+                            }
+                        });
                     }
+                }
             });
 
         prefsEditor.putString("alimentos", arrayStr).commit();
 
+    }
+
+    protected String SalvarListaOffline(boolean mostraMsg){
+        String arrayStr = null;
+        SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
+
+        JSONArray array = new JSONArray();
+        JSONObject obj;
+
+        for(Alimentos item : alimentos){
+            obj = new JSONObject();
+            try {
+                obj.put("nome", item.getNome());
+                obj.put("quantidade", item.getQuantidade());
+                obj.put("tipo", item.getTipo());
+                array.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        arrayStr = array.toString();
+        idUsuario = idUsuarioPref.getString("idUsuario", "Inexistente");
+        prefsEditor.putString("alimentos", arrayStr).commit();
+        if(mostraMsg) {
+            Toast.makeText(getApplicationContext(), "Lista Local Salva", Toast.LENGTH_SHORT).show();
+        }
+        return arrayStr;
+    }
+
+    protected void SalvarListaParse(String idUsuario, String arrayStr, boolean mostraMsg){
+        ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
+        ParseQuery<ParseObject>query = ParseQuery.getQuery("ListaDeAlimentos");
+        query.whereEqualTo("IdUsuario", idUsuario);
+        List<ParseObject> listaAlimento = null;
+        try {
+            listaAlimento = query.find();
+            if(listaAlimento.isEmpty()){
+                alimentosParse.put("Alimentos", arrayStr);
+                alimentosParse.put("IdUsuario", idUsuario);
+                alimentosParse.save();
+                if(mostraMsg) {
+                    Toast.makeText(getApplicationContext(), "Lista Criada", Toast.LENGTH_SHORT).show();
+                }
+            }
+            else {
+                String objectId = null;
+                for (ParseObject obj : listaAlimento) {
+                    objectId = obj.getObjectId();
+                }
+                alimentosParse = query.get(objectId);
+                alimentosParse.put("Alimentos", arrayStr);
+                alimentosParse.save();
+                if(mostraMsg) {
+                    Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
+                }
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
     }
 
     protected void InserirAlimento(){
@@ -233,8 +285,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     protected void ExcluirAmigoLista(){
         if(amigoSelecionado != null){
-
             adapterAmigos.remove(amigoSelecionado);
+            amigos.remove(amigoSelecionado);
+            AtualizaListaDeAmigos(amigos);
             amigoSelecionado = null;
         }
     }
@@ -271,9 +324,53 @@ public class MainActivity extends Activity implements View.OnClickListener{
         }
     }
 
+    private void AtualizaListaDeAmigos(List<Usuario> listaDeUsuarios){
+
+        SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+
+        JSONArray array = new JSONArray();
+        JSONObject obj;
+
+        for (Usuario usuario : listaDeUsuarios) {
+            obj = new JSONObject();
+            try {
+                obj.put("nomeUsuario", usuario.getNome());
+                obj.put("senhaUsuario", usuario.getSenha());
+
+                array.put(obj);
+            } catch (JSONException je) {
+                je.printStackTrace();
+            }
+        }
+        final String arrayStr = array.toString();//VERIFICAR
+        prefsEditor.putString("usuarios", arrayStr).commit();
+
+
+        String idUsuario = ObterUsuario();
+        if(!idUsuario.equals("Inexistente")){
+
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("ListaDeAmigos");
+            List<ParseObject> listaDeAmigos = null;
+            query.whereEqualTo("IdUsuario", idUsuario);
+            try {
+                listaDeAmigos = query.find();
+                if(!listaDeAmigos.isEmpty()){
+                    for(ParseObject objParse : listaDeAmigos){
+                        objParse.put("Dados", arrayStr);
+                        objParse.save();
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+
+
+    }
+
     protected void RecuperarListaDeAmigosJson(){
             try{
-                //JSONArray array = new JSONArray(mPrefs.getString("usuarios","usuarios"));
                 SharedPreferences aPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
                 JSONArray array = new JSONArray(aPrefs.getString("usuarios","usuarios"));
                 JSONObject obj;
@@ -291,11 +388,17 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
     }
 
+    protected String ObterUsuario(){
+        SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
+        return idUsuarioPref.getString("idUsuario","Inexistente");
+    }
+
     protected void ChecarUsuarioCadastrado(){
         SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
         SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
 
-        if(idUsuarioPref.getString("idUsuario","Inexistente").equals("Inexistente"))
+        if(idUsuarioPref.getString("idUsuario","Inexistente").equals("Inexistente") && !CadastroUsuarioActivity.EntrouSemLogar)
         {
             //CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
             Intent i = new Intent(this, CadastroUsuarioActivity.class);
@@ -336,9 +439,12 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
 
             case R.id.idBtnSalvarLista:
-
-                SalvarLista(true);
-
+                String idUsuario = ObterUsuario();
+                if(!idUsuario.equals("Inexistente")){
+                    SalvarListaParse(idUsuario,SalvarListaOffline(false),true);
+                }else {
+                    SalvarListaOffline(true);
+                }
                 break;
 
             case R.id.idBtnMinus:
@@ -382,7 +488,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                             e.printStackTrace();
                                         }
                                         if (idListaUsuario != null) {
-                                            //String idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
                                             try {
                                                 arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
                                                 alimentos.clear();
@@ -422,7 +527,8 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
 
             case R.id.idBtnCadastroUsuario:
-                SalvarLista(false);
+                //SalvarLista(false);
+                SalvarListaOffline(false);
                 Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
                 CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
                 finish();
@@ -535,11 +641,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
         });
 
 
-        listaDeAmigos.setOnItemClickListener(new AdapterView.OnItemClickListener(){
+        listaDeAmigos.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 view.setSelected(true);
-                amigoSelecionado = (Usuario)parent.getItemAtPosition(position);
+                amigoSelecionado = (Usuario) parent.getItemAtPosition(position);
 
             }
         });
@@ -584,7 +690,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
                                                 EscondeTeclado();
                                             }
-                                            if(tabId.equals("aba2")){
+                                            if (tabId.equals("aba2")) {
                                                 botaoMais.setVisibility(View.INVISIBLE);
                                                 botaoMenos.setVisibility(View.INVISIBLE);
                                                 botaoExcluir.setVisibility(View.INVISIBLE);
@@ -595,7 +701,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoExcluirAmigo.setVisibility(View.INVISIBLE);
 
                                             }
-                                            if(tabId.equals("aba3")){
+                                            if (tabId.equals("aba3")) {
 
                                                 botaoMais.setVisibility(View.INVISIBLE);
                                                 botaoMenos.setVisibility(View.INVISIBLE);
@@ -604,6 +710,11 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoObterListaAmigo.setVisibility(View.INVISIBLE);
                                                 botaosalvarAlimento.setVisibility(View.INVISIBLE);
                                                 botaoObterListaAmigo.setVisibility(View.VISIBLE);
+                                                if(ObterUsuario().equals("Inexistente")) {
+                                                    botaoCadastrarUsuario.setText("LOGIN");
+                                                }else{
+                                                    botaoCadastrarUsuario.setText("ADICIONAR AMIGO");
+                                                }
                                                 botaoCadastrarUsuario.setVisibility(View.VISIBLE);
                                                 botaoExcluirAmigo.setVisibility(View.VISIBLE);
 
@@ -611,6 +722,72 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                         }
                                     }
         );
+
+
+        botaoMenos.setOnTouchListener(new View.OnTouchListener() {
+            private Handler mHandler;
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (mHandler != null)
+                            return true;
+                        mHandler = new Handler();
+                        mHandler.postDelayed(mAction, 300);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        if (mHandler == null)
+                            return true;
+                        mHandler.removeCallbacks(mAction);
+                        mHandler = null;
+                        break;
+                }
+
+                return false;
+            }
+
+            Runnable mAction = new Runnable() {
+                @Override
+                public void run() {
+                    AlterarQuantidade(-1);
+                    mHandler.postDelayed(this, 300);
+                }
+            };
+        });
+
+        botaoMais.setOnTouchListener(new View.OnTouchListener() {
+            private Handler mHandler;
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()){
+                    case MotionEvent.ACTION_DOWN:
+                        if(mHandler != null)
+                            return true;
+                        mHandler = new Handler();
+                        mHandler.postDelayed(mAction, 300);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if(mHandler == null)
+                            return true;
+                        mHandler.removeCallbacks(mAction);
+                        mHandler = null;
+                        break;
+                }
+
+                return false;
+            }
+
+            Runnable mAction = new Runnable() {
+                @Override
+                public void run() {
+                    AlterarQuantidade(+1);
+                    mHandler.postDelayed(this, 300);
+                };
+            };
+        });
+
     }
 
     @Override

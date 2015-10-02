@@ -38,7 +38,7 @@
         android:layout_alignParentTop="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:text="@string/lbl_txt_nomeGenerico" />
+        android:text="@string/lbl_txt_nomeUsuario" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -51,62 +51,74 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true" />
 
-    <Button
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/txt_Btn_Logar"
-        android:id="@+id/idBtnSalvarUsuario"
-        android:layout_above="@+id/idBtnVoltar"
-        android:layout_centerHorizontal="true"
-        style="?android:attr/buttonBarButtonStyle"/>
-
     <RadioGroup
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:weightSum="1"
         android:orientation="vertical"
         android:checkedButton="@+id/idRadBtnLogar"
         android:id="@+id/idRadioGroupCadastroUsuario"
-        android:layout_above="@+id/idBtnSalvarUsuario"
+        android:gravity="center"
+        android:layout_centerVertical="true"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/idBtnSalvarUsuario"
-        android:layout_alignLeft="@+id/idBtnSalvarUsuario"
-        android:layout_alignStart="@+id/idBtnSalvarUsuario"
-        android:layout_below="@+id/idEditTextSenhaUsuario"
-        android:gravity="center">
+        android:layout_alignParentEnd="true">
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/logar_texto"
             android:id="@+id/idRadBtnLogar"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            android:singleLine="true" />
 
         <RadioButton
             android:layout_width="wrap_content"
             android:layout_height="52dp"
             android:text="@string/textoCadastroUsuario"
             android:id="@+id/idRadBtnUsuario"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            android:singleLine="true" />
 
         <RadioButton
             android:layout_width="180dp"
             android:layout_height="wrap_content"
             android:text="@string/textoCadastrarAmigo"
             android:id="@+id/idRadBtnCadastroAmigo"
-            android:layout_gravity="center_vertical" />
+            android:layout_gravity="center_vertical"
+            android:singleLine="true" />
+
     </RadioGroup>
 
-    <Button
-        style="?android:attr/buttonBarButtonStyle"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Voltar"
-        android:id="@+id/idBtnVoltar"
         android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:visibility="invisible"
-        android:clickable="false" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentStart="true"
+        android:id="@+id/linearLayout">
+
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/txt_Btn_Logar"
+            android:id="@+id/idBtnSalvarUsuario"
+            android:layout_above="@+id/idBtnVoltar"
+            android:layout_centerHorizontal="true"
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_gravity="center_horizontal" />
+
+        <Button
+            style="?android:attr/buttonBarButtonStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Voltar"
+            android:id="@+id/idBtnVoltar"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:visibility="visible"
+            android:clickable="false"
+            android:layout_gravity="center_horizontal" />
+    </LinearLayout>
 
 </RelativeLayout>

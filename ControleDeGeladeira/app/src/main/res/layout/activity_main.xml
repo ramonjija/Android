@@ -81,11 +81,11 @@
 
                         android:layout_gravity="center_horizontal"
                         android:layout_alignParentBottom="false"
-                        android:layout_alignParentLeft="false"
-                        android:layout_alignParentRight="false"
                         android:layout_alignWithParentIfMissing="false"
-                        android:layout_centerHorizontal="true"
-                        android:layout_above="@+id/idBtnExclude" />
+                        android:layout_above="@+id/idBtnExclude"
+                        android:layout_toRightOf="@+id/idBtnMinus"
+                        android:layout_alignRight="@+id/idBtnExclude"
+                        android:layout_alignEnd="@+id/idBtnExclude" />
 
                     <Button
                         style="?android:attr/buttonBarButtonStyle"
@@ -97,7 +97,8 @@
                         android:layout_toRightOf="@+id/idBtnExclude"
                         android:layout_toEndOf="@+id/idBtnExclude"
                         android:visibility="visible"
-                        android:textSize="25sp" />
+                        android:textSize="25sp"
+                        android:layout_alignTop="@+id/idBtnMinus" />
 
                 </RelativeLayout>
 

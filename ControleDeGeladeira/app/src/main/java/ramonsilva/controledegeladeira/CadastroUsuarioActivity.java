@@ -1,9 +1,11 @@
 package ramonsilva.controledegeladeira;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -50,13 +52,30 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     private String mensagem = "Aguarde...";
     private String idUsuarioLogado = null;
     private boolean cadastrouAmigo = false;
-
+    public static boolean EntrouSemLogar = false;
 
     private void PassarParametroEiniciarActivity(Intent i){
         i = new Intent(getApplicationContext(), MainActivity.class);
         i.putExtra("ParseIniciado","sim");
         finish();
         startActivity(i);
+    }
+
+    private void AceitarTermosSemLogin(){
+
+       final Intent VoltarMain = new Intent(this, MainActivity.class);
+        new AlertDialog.Builder(this)
+                .setMessage("Ao entrar sem logar, não será possível adicionar amigos e compartilhar listas. Você tem certeza que deseja prosseguir?")
+                .setCancelable(false)
+                .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                        finish();
+                        PassarParametroEiniciarActivity(VoltarMain);
+                    }
+                })
+                .setNegativeButton("Não", null)
+                .show();
     }
 
     private boolean VerificarSeAmigoEstaCadastrado(List<Usuario> listaDeAmigos, String nome){
@@ -142,6 +161,8 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         prefsEditorListaAmigos = idListaAmigos.edit();
 
         botaoVoltar = (Button) findViewById(R.id.idBtnVoltar);
+        botaoSalvarUsuario = (Button) findViewById(R.id.idBtnSalvarUsuario);
+
 
         if (!idUsuario.getString("idUsuario", "Inexistente").equals("Inexistente")) {
             rdoBtnSalvarUsuario.setEnabled(false);
@@ -150,13 +171,19 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             rdoBtnSalvarAmigos.setChecked(true);
             botaoVoltar.setVisibility(View.VISIBLE);
             botaoVoltar.setClickable(true);
+            botaoVoltar.setText("Voltar");
             botaoVoltar.setOnClickListener(this);
+            botaoSalvarUsuario.setText("Adicionar");
         }else{
             rdoBtnSalvarAmigos.setChecked(false);
             rdoBtnSalvarAmigos.setEnabled(false);
+            botaoVoltar.setVisibility(View.VISIBLE);
+            botaoVoltar.setClickable(true);
+            botaoVoltar.setText("Entrar Sem Logar");
+            botaoVoltar.setOnClickListener(this);
         }
 
-        botaoSalvarUsuario = (Button) findViewById(R.id.idBtnSalvarUsuario);
+
         listaDeUsuarios = (ArrayList) listaDeUsuariosRecebidos;
         listaDeUsuariosRecebidos = null;
 
@@ -169,9 +196,13 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                 if (checkedId == R.id.idRadBtnCadastroAmigo) {
                     cadastroUsuario = false;
                     logarUsuario = false;
+                    botaoSalvarUsuario.setText("ADICIONAR");
                 } else if (checkedId == R.id.idRadBtnLogar) {
                     cadastroUsuario = false;
                     logarUsuario = true;
+                    botaoSalvarUsuario.setText("LOGAR");
+                }else if(checkedId == R.id.idRadBtnUsuario){
+                    botaoSalvarUsuario.setText("CADASTRAR");
                 }
 
             }
@@ -181,12 +212,9 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     }
 
-
     @Override
     public void onBackPressed() {
 
-        //Intent intent = new Intent(this, MainActivity.class);
-        //startActivity(intent);
         if(!rdoBtnLogarUsuario.isEnabled() && !rdoBtnSalvarUsuario.isEnabled()){
                 Intent i = new Intent(this, MainActivity.class);
                 finish();
@@ -201,15 +229,19 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
         switch (v.getId()){
             case R.id.idBtnVoltar:
-                finish();
-                Intent VoltarMain = new Intent(this,MainActivity.class);
-                PassarParametroEiniciarActivity(VoltarMain);
+                if(botaoVoltar.getText().equals("Entrar Sem Logar")){
+                    EntrouSemLogar = true;
+                    AceitarTermosSemLogin();
+                }
+                else {
+                    finish();
+                    Intent VoltarMain = new Intent(this, MainActivity.class);
+                    PassarParametroEiniciarActivity(VoltarMain);
+                }
                 break;
-            case R.id.idBtnCadastroUsuario:
 
-
+            case R.id.idBtnSalvarUsuario:
                 Toast.makeText(getApplicationContext(), "Aguarde...",Toast.LENGTH_SHORT).show();
-
                 EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
                 EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
                 nome = txtNome.getText().toString();
@@ -225,7 +257,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                               @Override
                                                               public void done(List<ParseObject> list, ParseException e) {
                                                                   if (e != null) {
-                                                                      //TODO: Retornar para a main após cadastro bem sucedido
                                                                       Toast.makeText(getApplicationContext(), "Um erro ocorreu: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                                                                       e.printStackTrace();
 
@@ -270,7 +301,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                               }
                                                           }
                             );
-
                             txtNome.setText("");
                             txtSenha.setText("");
 

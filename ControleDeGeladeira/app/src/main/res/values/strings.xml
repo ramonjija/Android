@@ -12,10 +12,10 @@
     <string name="txtBtnExclude">Excluir Alimento</string>
     <string name="txtBtnMinus">-</string>
     <string name="obterListaAmigo">Alimentos</string>
-    <string name="title_activity_cadastro_usuario">Cadastro de Usuarios</string>
+    <string name="title_activity_cadastro_usuario">Área do Usuário</string>
     <string name="Senha">Senha:</string>
     <string name="textoCadastroUsuario">Me Cadastrar</string>
-    <string name="textoCadastrarAmigo">Cadastrar Amigo</string>
+    <string name="textoCadastrarAmigo">Adicionar Amigo</string>
     <string name="logar_texto">Me Logar</string>
     <string name="txt_rdoBtn_Kg">kg</string>
     <string name="txt_rdoBtn_g">g</string>
@@ -25,4 +25,5 @@
     <string name="lbl_txt_nomeGenerico">Nome:</string>
     <string name="txt_btn_Voltar">Voltar</string>
     <string name="txt_Btn_ExcluirAmigo">Excluir</string>
+    <string name="lbl_txt_nomeUsuario">Usuário:</string>
 </resources>
