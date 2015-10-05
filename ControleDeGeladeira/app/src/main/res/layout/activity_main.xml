@@ -120,9 +120,10 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                             android:text="@string/nome"
-                            android:id="@+id/txtViewNome" />
+                            android:id="@+id/txtViewNome"
+                            android:textColor="#ff000000" />
 
                         <EditText
                             android:id="@+id/idNome"
@@ -133,10 +134,11 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:textAppearance="?android:attr/textAppearanceLarge"
+                            android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
                             android:text="@string/quantidadeAlimento"
                             android:id="@+id/txtViewQuantidade"
-                            android:layout_marginTop="5dp" />
+                            android:layout_marginTop="5dp"
+                            android:textColor="#ff000000" />
 
                         <EditText
                             android:id="@+id/idQuantidade"

@@ -89,14 +89,14 @@
 
     </RadioGroup>
 
-    <LinearLayout
+    <RelativeLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:layout_alignParentStart="true"
-        android:id="@+id/linearLayout">
+        android:id="@+id/idRelativeLayout">
 
         <Button
             android:layout_width="wrap_content"
@@ -119,6 +119,6 @@
             android:visibility="visible"
             android:clickable="false"
             android:layout_gravity="center_horizontal" />
-    </LinearLayout>
+    </RelativeLayout>
 
 </RelativeLayout>

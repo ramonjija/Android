@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
@@ -78,12 +79,25 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private RadioButton rdoBtnG = null;
     private RadioButton rdoBtnLitro = null;
     private RadioButton rdoBtnUnidade = null;
-    private String tipo = "Unidades";
+    private String tipo = "Unidade(s)";
 
     private ListView lista = null;
 
     private String idUsuario = null;
 
+    private boolean VerificarConexao(){
+        boolean conectado = false;
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getActiveNetworkInfo() != null) {
+            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()){
+
+                conectado = true;
+            }else if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()){
+                conectado = true;
+            }
+        }
+        return conectado;
+    }
 
     protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
         JSONArray ListaAlimentosObtidos = null;//
@@ -202,34 +216,39 @@ public class MainActivity extends Activity implements View.OnClickListener{
     }
 
     protected void SalvarListaParse(String idUsuario, String arrayStr, boolean mostraMsg){
-        ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
-        ParseQuery<ParseObject>query = ParseQuery.getQuery("ListaDeAlimentos");
-        query.whereEqualTo("IdUsuario", idUsuario);
-        List<ParseObject> listaAlimento = null;
-        try {
-            listaAlimento = query.find();
-            if(listaAlimento.isEmpty()){
-                alimentosParse.put("Alimentos", arrayStr);
-                alimentosParse.put("IdUsuario", idUsuario);
-                alimentosParse.save();
-                if(mostraMsg) {
-                    Toast.makeText(getApplicationContext(), "Lista Criada", Toast.LENGTH_SHORT).show();
+        CadastroUsuarioActivity userActivity = new CadastroUsuarioActivity();
+        if(VerificarConexao()) {
+            ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
+            ParseQuery<ParseObject> query = ParseQuery.getQuery("ListaDeAlimentos");
+            query.whereEqualTo("IdUsuario", idUsuario);
+            List<ParseObject> listaAlimento = null;
+            try {
+                listaAlimento = query.find();
+                if (listaAlimento.isEmpty()) {
+                    alimentosParse.put("Alimentos", arrayStr);
+                    alimentosParse.put("IdUsuario", idUsuario);
+                    alimentosParse.save();
+                    if (mostraMsg) {
+                        Toast.makeText(getApplicationContext(), "Lista Criada", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    String objectId = null;
+                    for (ParseObject obj : listaAlimento) {
+                        objectId = obj.getObjectId();
+                    }
+                    alimentosParse = query.get(objectId);
+                    alimentosParse.put("Alimentos", arrayStr);
+                    alimentosParse.save();
+                    if (mostraMsg) {
+                        Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
+                    }
                 }
+            } catch (ParseException e) {
+                e.printStackTrace();
             }
-            else {
-                String objectId = null;
-                for (ParseObject obj : listaAlimento) {
-                    objectId = obj.getObjectId();
-                }
-                alimentosParse = query.get(objectId);
-                alimentosParse.put("Alimentos", arrayStr);
-                alimentosParse.save();
-                if(mostraMsg) {
-                    Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
-                }
-            }
-        } catch (ParseException e) {
-            e.printStackTrace();
+        }
+        else{
+            Toast.makeText(getApplicationContext(), "Não há conexão com a internet. Lista local salva.",Toast.LENGTH_LONG).show();
         }
     }
 
@@ -285,13 +304,73 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     protected void ExcluirAmigoLista(){
         if(amigoSelecionado != null){
+            if(VerificarConexao()){
             adapterAmigos.remove(amigoSelecionado);
             amigos.remove(amigoSelecionado);
             AtualizaListaDeAmigos(amigos);
             amigoSelecionado = null;
+            }else{
+                Toast.makeText(getApplicationContext(),"Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
+            }
         }
     }
     //TODO: Criar metodo para salvar a lista (Atualizada) de amigos após exclusão
+
+    private void ObterAlimentosAmigos () {
+        new AlertDialog.Builder(this)
+                .setMessage("Você tem certeza que deseja substituir sua lista?")
+                .setCancelable(false)
+                .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
+
+                    public void onClick(DialogInterface dialog, int id) {
+                               /**/
+
+                        JSONArray arrayAlimentos;
+                        if (amigoSelecionado != null) {
+                            String message = "Lista Atualizada com sucesso: " + amigoSelecionado.getNome();
+                            String idListaUsuario = null;
+                            try {
+                                idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                            }
+                            if (idListaUsuario != null) {
+                                try {
+                                    arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
+                                    alimentos.clear();
+                                    JSONObject obj;
+                                    Alimentos alimento;
+                                    for (int i = 0; i < arrayAlimentos.length(); i++) {
+                                        try {
+                                            obj = arrayAlimentos.getJSONObject(i);
+                                            alimento = new Alimentos();
+                                            alimento.setNome(obj.getString("nome"));
+                                            alimento.setQuantidade(obj.getString("quantidade"));
+                                            alimento.setTipo(obj.getString("tipo"));
+                                            alimentos.add(alimento);
+                                        } catch (JSONException e) {
+                                            e.printStackTrace();
+                                        }
+                                    }
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                            } else {
+
+                                message = "O usuario " + amigoSelecionado.getNome() + " nao possui lista!";
+
+                            }
+                            Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
+
+                        }
+                    }
+                })
+                .setNegativeButton("Não", null)
+                .show();
+    }
 
     protected void RecuperarListaDoJson(){
         try {
@@ -326,46 +405,51 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
     private void AtualizaListaDeAmigos(List<Usuario> listaDeUsuarios){
 
-        SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
-        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        CadastroUsuarioActivity userActivity = new CadastroUsuarioActivity();
+        if(VerificarConexao()) {
 
-        JSONArray array = new JSONArray();
-        JSONObject obj;
+            SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+            SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
-        for (Usuario usuario : listaDeUsuarios) {
-            obj = new JSONObject();
-            try {
-                obj.put("nomeUsuario", usuario.getNome());
-                obj.put("senhaUsuario", usuario.getSenha());
+            JSONArray array = new JSONArray();
+            JSONObject obj;
 
-                array.put(obj);
-            } catch (JSONException je) {
-                je.printStackTrace();
-            }
-        }
-        final String arrayStr = array.toString();//VERIFICAR
-        prefsEditor.putString("usuarios", arrayStr).commit();
+            for (Usuario usuario : listaDeUsuarios) {
+                obj = new JSONObject();
+                try {
+                    obj.put("nomeUsuario", usuario.getNome());
+                    obj.put("senhaUsuario", usuario.getSenha());
 
-
-        String idUsuario = ObterUsuario();
-        if(!idUsuario.equals("Inexistente")){
-
-            ParseQuery<ParseObject> query = ParseQuery.getQuery("ListaDeAmigos");
-            List<ParseObject> listaDeAmigos = null;
-            query.whereEqualTo("IdUsuario", idUsuario);
-            try {
-                listaDeAmigos = query.find();
-                if(!listaDeAmigos.isEmpty()){
-                    for(ParseObject objParse : listaDeAmigos){
-                        objParse.put("Dados", arrayStr);
-                        objParse.save();
-                    }
+                    array.put(obj);
+                } catch (JSONException je) {
+                    je.printStackTrace();
                 }
-            } catch (ParseException e) {
-                e.printStackTrace();
             }
-        }
+            final String arrayStr = array.toString();//VERIFICAR
+            prefsEditor.putString("usuarios", arrayStr).commit();
 
+
+            String idUsuario = ObterUsuario();
+            if (!idUsuario.equals("Inexistente")) {
+
+                ParseQuery<ParseObject> query = ParseQuery.getQuery("ListaDeAmigos");
+                List<ParseObject> listaDeAmigos = null;
+                query.whereEqualTo("IdUsuario", idUsuario);
+                try {
+                    listaDeAmigos = query.find();
+                    if (!listaDeAmigos.isEmpty()) {
+                        for (ParseObject objParse : listaDeAmigos) {
+                            objParse.put("Dados", arrayStr);
+                            objParse.save();
+                        }
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }else{
+            Toast.makeText(getApplicationContext(), "Não há conexão com a internet.",Toast.LENGTH_SHORT).show();
+        }
 
     }
 
@@ -439,6 +523,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
 
             case R.id.idBtnSalvarLista:
+                Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
                 String idUsuario = ObterUsuario();
                 if(!idUsuario.equals("Inexistente")){
                     SalvarListaParse(idUsuario,SalvarListaOffline(false),true);
@@ -466,63 +551,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
 
             case R.id.idBtnObterListaAmigo:
-
+                Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
                 if(amigoSelecionado != null) {
-
-
-                    new AlertDialog.Builder(this)
-                            .setMessage("Você tem certeza que deseja substituir sua lista?")
-                            .setCancelable(false)
-                            .setPositiveButton("Sim", new DialogInterface.OnClickListener() {
-
-                                public void onClick(DialogInterface dialog, int id) {
-                               /**/
-
-                                    JSONArray arrayAlimentos;
-                                    if (amigoSelecionado != null) {
-                                        String message = "Lista Atualizada com sucesso: " + amigoSelecionado.getNome();
-                                        String idListaUsuario = null;
-                                        try {
-                                            idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
-                                        } catch (ParseException e) {
-                                            e.printStackTrace();
-                                        }
-                                        if (idListaUsuario != null) {
-                                            try {
-                                                arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
-                                                alimentos.clear();
-                                                JSONObject obj;
-                                                Alimentos alimento;
-                                                for (int i = 0; i < arrayAlimentos.length(); i++) {
-                                                    try {
-                                                        obj = arrayAlimentos.getJSONObject(i);
-                                                        alimento = new Alimentos();
-                                                        alimento.setNome(obj.getString("nome"));
-                                                        alimento.setQuantidade(obj.getString("quantidade"));
-                                                        alimento.setTipo(obj.getString("tipo"));
-                                                        alimentos.add(alimento);
-                                                    } catch (JSONException e) {
-                                                        e.printStackTrace();
-                                                    }
-                                                }
-                                            } catch (ParseException e) {
-                                                e.printStackTrace();
-                                            } catch (JSONException e) {
-                                                e.printStackTrace();
-                                            }
-
-                                        } else {
-
-                                            message = "O usuario " + amigoSelecionado.getNome() + " nao possui lista!";
-
-                                        }
-                                        Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
-
-                                    }
-                                }
-                            })
-                            .setNegativeButton("Não", null)
-                            .show();
+                    if(VerificarConexao()) {
+                        ObterAlimentosAmigos();
+                    }else{
+                        Toast.makeText(getApplicationContext(),"Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 break;
 
@@ -536,7 +571,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
 
             case R.id.idBtnExcluirAmigo:
-
                 ExcluirAmigoLista();
                 break;
             default:
@@ -565,7 +599,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         descritor = tab.newTabSpec("aba3");
         descritor.setContent(R.id.idListViewAmigos);
-        descritor.setIndicator("Lista de amigos");
+        descritor.setIndicator("Área do Usuário");
         tab.addTab(descritor);
 
         rdoBtnKg = (RadioButton)findViewById(R.id.rdoBtnKg);
@@ -578,13 +612,13 @@ public class MainActivity extends Activity implements View.OnClickListener{
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
                 if(checkedId == R.id.rdoBtnKg){
-                    tipo = "Kilos";
+                    tipo = "Kilo(s)";
                 }else if(checkedId == R.id.rdoBtnG){
-                    tipo = "Gramas";
+                    tipo = "Grama(s)";
                 }else if(checkedId == R.id.rdoBtnLitro){
-                    tipo = "Litros";
+                    tipo = "Litro(s)";
                 }else{
-                    tipo = "Unidades";
+                    tipo = "Unidade(s)";
                 }
 
             }
