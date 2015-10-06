@@ -1,5 +1,6 @@
 package ramonsilva.controledegeladeira;
 
+import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -7,6 +8,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.Menu;
@@ -18,10 +20,13 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -32,7 +37,6 @@ import java.util.List;
 
 import com.parse.FindCallback;
 import com.parse.GetCallback;
-import com.parse.Parse;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
@@ -42,7 +46,7 @@ import android.os.Handler;
 
 
 
-public class MainActivity extends Activity implements View.OnClickListener{
+public class MainActivity extends ActionBarActivity implements View.OnClickListener{
 
     private List<Alimentos> alimentos = new ArrayList<Alimentos>();
     private AlimentoAdapter adapter = null;
@@ -84,6 +88,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
     private ListView lista = null;
 
     private String idUsuario = null;
+
+    private TextView txtViewUsuario = null;
+    private TextView txtViewIdUsuario = null;
 
     private boolean VerificarConexao(){
         boolean conectado = false;
@@ -429,7 +436,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
             prefsEditor.putString("usuarios", arrayStr).commit();
 
 
-            String idUsuario = ObterUsuario();
+            String idUsuario = ObterIdUsuario();
             if (!idUsuario.equals("Inexistente")) {
 
                 ParseQuery<ParseObject> query = ParseQuery.getQuery("ListaDeAmigos");
@@ -472,10 +479,24 @@ public class MainActivity extends Activity implements View.OnClickListener{
             }
     }
 
-    protected String ObterUsuario(){
+    protected String ObterIdUsuario(){
         SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
         SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
         return idUsuarioPref.getString("idUsuario","Inexistente");
+    }
+
+    protected String ObterNomeUsuario(String idUsuario){
+        String nomeUsuario = "Inexistente";
+        ParseQuery<ParseObject> queryNomeUser = ParseQuery.getQuery("Usuario");
+        queryNomeUser.whereEqualTo("objectId",idUsuario);
+        try {
+            ParseObject objetoUser = queryNomeUser.getFirst();
+            nomeUsuario = objetoUser.get("nome").toString();
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return nomeUsuario;
     }
 
     protected void ChecarUsuarioCadastrado(){
@@ -524,7 +545,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
             case R.id.idBtnSalvarLista:
                 Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
-                String idUsuario = ObterUsuario();
+                String idUsuario = ObterIdUsuario();
                 if(!idUsuario.equals("Inexistente")){
                     SalvarListaParse(idUsuario,SalvarListaOffline(false),true);
                 }else {
@@ -551,8 +572,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
                 break;
 
             case R.id.idBtnObterListaAmigo:
-                Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
+
                 if(amigoSelecionado != null) {
+                    Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
                     if(VerificarConexao()) {
                         ObterAlimentosAmigos();
                     }else{
@@ -583,6 +605,23 @@ public class MainActivity extends Activity implements View.OnClickListener{
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        //actionBar.setDisplayShowHomeEnabled(true);
+        //actionBar.setDisplayHomeAsUpEnabled(true);
+        //actionBar.setIcon(R.mipmap.ic_launcher_geladeira_verde);
+        actionBar.setHomeButtonEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
+
+
+
+        /*String idUsuarioLogado = ObterIdUsuario();
+        txtViewUsuario = (TextView)findViewById(R.id.txtViewUsuarioLogado);
+        txtViewUsuario.setText(ObterNomeUsuario(idUsuarioLogado));
+        txtViewIdUsuario = (TextView)findViewById(R.id.txtViewUsuarioID);
+        txtViewIdUsuario.setText(idUsuarioLogado);*/
+
         TabHost tab = (TabHost)findViewById(R.id.tabHost);
         tab.setup();
 
@@ -623,16 +662,6 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
             }
         });
-
-
-        //Inicio da configuracao do Parse
-        //Parse.enableLocalDatastore(this);
-        //Parse.initialize(this, "OxsN4cdSYTNtg2qyJykqelYMsA1CpQauyvKxThlg", "pc4XHC2JdJx1OpcrpLKi99CAucVR68XhBtxfc4v1");
-
-        //InitParse();
-
-
-        //Verifica se o usuario foi cadastrado
 
 
 
@@ -744,9 +773,9 @@ public class MainActivity extends Activity implements View.OnClickListener{
                                                 botaoObterListaAmigo.setVisibility(View.INVISIBLE);
                                                 botaosalvarAlimento.setVisibility(View.INVISIBLE);
                                                 botaoObterListaAmigo.setVisibility(View.VISIBLE);
-                                                if(ObterUsuario().equals("Inexistente")) {
+                                                if (ObterIdUsuario().equals("Inexistente")) {
                                                     botaoCadastrarUsuario.setText("LOGIN");
-                                                }else{
+                                                } else {
                                                     botaoCadastrarUsuario.setText("ADICIONAR AMIGO");
                                                 }
                                                 botaoCadastrarUsuario.setVisibility(View.VISIBLE);
@@ -760,6 +789,7 @@ public class MainActivity extends Activity implements View.OnClickListener{
 
         botaoMenos.setOnTouchListener(new View.OnTouchListener() {
             private Handler mHandler;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
 
@@ -839,18 +869,25 @@ public class MainActivity extends Activity implements View.OnClickListener{
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        /*if (id == R.id.action_settings) {
             return true;
+        }*/
+        switch(id){
+            case android.R.id.home:{
+                //aparece e desaparece o menu
+                return true;
+            }
+            default:
+                return super.onOptionsItemSelected(item);
         }
 
-        return super.onOptionsItemSelected(item);
+
     }
 
     @Override
     protected void onPause() {
         super.onPause();
     }
-
 
 }
 

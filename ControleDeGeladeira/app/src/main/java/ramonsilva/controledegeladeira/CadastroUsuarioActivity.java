@@ -242,7 +242,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
 
         switch (v.getId()) {
             case R.id.idBtnVoltar:
@@ -257,6 +256,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                 break;
 
             case R.id.idBtnSalvarUsuario:
+                Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
                 if (VerificarConexao()) {
                     Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
                     EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
@@ -487,7 +487,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         getMenuInflater().inflate(R.menu.menu_cadastro_usuario, menu);
         return true;
     }
-
+/*
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
@@ -501,5 +501,5 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 }
