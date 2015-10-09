@@ -1,11 +1,21 @@
 
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:id="@+id/idDrawerLayout"
     style="?android:attr/buttonBarStyle"
     tools:context="ramonsilva.controledegeladeira.MainActivity">
 
-    <TabHost
+
+    <!--Principal-->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/idRelLayPrincipal"
+        android:nestedScrollingEnabled="false">
+
+        <TabHost
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/tabHost">
@@ -14,6 +24,16 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical" >
+
+            <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+                android:id="@+id/idToolbar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                android:background="@color/material_deep_teal_500"
+                android:elevation="4dp"
+                >
+            </android.support.v7.widget.Toolbar>
 
             <TabWidget
                 android:id="@android:id/tabs"
@@ -284,4 +304,60 @@
         </LinearLayout>
 
     </TabHost>
-</RelativeLayout>
+
+    </FrameLayout>
+
+    <!--Perfil-->
+    <RelativeLayout
+        android:layout_width="280dp"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+
+        >
+
+        <RelativeLayout
+            android:id="@+id/idRelLayUserNameId"
+            android:layout_height="150dp"
+            android:layout_width="280dp"
+            android:background="#00BFA5"
+            >
+
+
+            <TextView
+                android:paddingTop="10dp"
+                android:paddingLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Não Logado"
+                android:id="@+id/idTxtViewUserNameDrawer" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:id="@+id/idTxtViewUserIDDrawer"
+                android:layout_below="@+id/idTxtViewUserNameDrawer"
+                android:paddingTop="10dp"
+                android:paddingLeft="5dp"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true" />
+
+                />
+        </RelativeLayout>
+        <ListView
+            android:layout_below="@+id/idRelLayUserNameId"
+            android:id="@+id/left_drawer"
+            android:layout_width="280dp"
+            android:layout_height="match_parent"
+            android:choiceMode="singleChoice"
+            android:divider="@android:color/transparent"
+            android:dividerHeight="0dp"
+            android:background="#006064"/>
+
+
+    </RelativeLayout>
+
+
+
+</android.support.v4.widget.DrawerLayout>

@@ -1,13 +1,300 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical" android:layout_width="match_parent"
-    android:layout_height="match_parent">
 
-    <EditText
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    style="?android:attr/buttonBarStyle"
+    tools:context="ramonsilva.controledegeladeira.MainActivity">
+
+
+
+
+    <!--Principal-->
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:inputType="numberDecimal"
-        android:ems="10"
-        android:id="@+id/editText"
-        android:layout_gravity="center_horizontal" />
-</LinearLayout>
+        android:layout_height="match_parent"
+        android:id="@+id/idRelLayPrincipal">
+        <TabHost
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/tabHost">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical" >
+
+                <TabWidget
+                    android:id="@android:id/tabs"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:textAlignment="center"
+                    android:baselineAligned="false" />
+
+                <FrameLayout
+                    android:id="@android:id/tabcontent"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent" >
+
+                    <RelativeLayout
+                        style="?android:attr/buttonBarStyle"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/idRelLayLista">
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:background="?android:attr/activatedBackgroundIndicator"
+                            android:weightSum="1"
+                            android:layout_above="@+id/idBtnSalvarLista">
+
+                            <ListView
+                                android:id="@+id/idListViewAlimentos"
+                                android:layout_width="match_parent"
+                                android:layout_height="271dp"
+                                android:choiceMode="singleChoice"
+                                android:listSelector="@drawable/selected"
+                                android:background="@android:color/transparent"
+                                android:clickable="true"
+                                android:layout_weight="0.56"
+                                android:headerDividersEnabled="true" />
+
+                        </LinearLayout>
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txtBtnMinus"
+                            android:id="@+id/idBtnMinus"
+                            android:layout_alignParentBottom="true"
+                            android:layout_toLeftOf="@+id/idBtnExclude"
+                            android:layout_toStartOf="@+id/idBtnExclude"
+                            android:visibility="visible"
+                            android:textSize="30sp" />
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txtBtnExclude"
+                            android:id="@+id/idBtnExclude"
+                            android:layout_alignParentBottom="true"
+                            android:layout_centerHorizontal="true"
+                            android:visibility="visible" />
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/btnSalvar"
+                            android:id="@+id/idBtnSalvarLista"
+                            android:layout_alignParentTop="false"
+                            android:visibility="visible"
+
+                            android:layout_gravity="center_horizontal"
+                            android:layout_alignParentBottom="false"
+                            android:layout_alignWithParentIfMissing="false"
+                            android:layout_above="@+id/idBtnExclude"
+                            android:layout_toRightOf="@+id/idBtnMinus"
+                            android:layout_alignRight="@+id/idBtnExclude"
+                            android:layout_alignEnd="@+id/idBtnExclude" />
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="@string/txtBtnPlus"
+                            android:id="@+id/idBtnPlus"
+                            android:layout_alignParentBottom="true"
+                            android:layout_toRightOf="@+id/idBtnExclude"
+                            android:layout_toEndOf="@+id/idBtnExclude"
+                            android:visibility="visible"
+                            android:textSize="25sp"
+                            android:layout_alignTop="@+id/idBtnMinus" />
+
+                    </RelativeLayout>
+
+
+                    <RelativeLayout
+                        style="?android:attr/buttonBarStyle"
+                        android:id="@+id/Cadastro"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentTop="true"
+                            android:orientation="vertical"
+                            android:id="@+id/idLayoutCadastroAlimento"
+                            android:gravity="bottom">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                                android:text="@string/nome"
+                                android:id="@+id/txtViewNome"
+                                android:textColor="#ff000000" />
+
+                            <EditText
+                                android:id="@+id/idNome"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="text" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:textAppearance="@style/Base.TextAppearance.AppCompat.Medium"
+                                android:text="@string/quantidadeAlimento"
+                                android:id="@+id/txtViewQuantidade"
+                                android:layout_marginTop="5dp"
+                                android:textColor="#ff000000" />
+
+                            <EditText
+                                android:id="@+id/idQuantidade"
+                                android:layout_width="fill_parent"
+                                android:layout_height="wrap_content"
+                                android:inputType="numberDecimal" />
+
+
+                            <RadioGroup
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="horizontal"
+                                android:layout_alignEnd="@+id/idQuantidade"
+                                android:id="@+id/idRdoGroupModal"
+                                android:layout_alignParentTop="false"
+                                android:layout_alignParentBottom="true"
+                                android:layout_marginTop="25dp">
+
+                                <RadioButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/txt_rdoBtn_Kg"
+                                    android:id="@+id/rdoBtnKg"
+                                    android:layout_marginRight="10dp"
+                                    android:textStyle="bold" />
+
+                                <RadioButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/txt_rdoBtn_g"
+                                    android:id="@+id/rdoBtnG"
+                                    android:layout_marginRight="10dp"
+                                    android:textStyle="bold" />
+
+                                <RadioButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/txt_rdoBtn_Litro"
+                                    android:id="@+id/rdoBtnLitro"
+                                    android:layout_marginRight="10dp"
+                                    android:textStyle="bold" />
+
+                                <RadioButton
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="@string/txt_rdoBtn_Unidade"
+                                    android:id="@+id/rdoBtnUnidade"
+                                    android:checked="true"
+                                    android:textStyle="bold" />
+                            </RadioGroup>
+
+
+                        </LinearLayout>
+
+
+
+                        <Button
+                            style="?android:attr/buttonBarButtonStyle"
+                            android:id="@+id/idBtnSalvar"
+                            android:layout_width="fill_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:text="@string/btnAdicionarAlimento" />
+                    </RelativeLayout>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:id="@+id/idRelLayUsuarios"
+                        >
+
+                        <LinearLayout
+                            android:orientation="vertical"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent">
+
+                            <ListView
+                                android:layout_width="match_parent"
+                                android:layout_height="271dp"
+                                android:id="@+id/idListViewAmigos"
+                                android:listSelector="@drawable/selected"
+                                android:layout_weight="0.56"
+                                android:clickable="true"
+                                android:choiceMode="singleChoice" />
+                        </LinearLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/idTxtViewListaAmigo" />
+                        <LinearLayout
+                            style="?android:attr/buttonBarStyle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_alignParentBottom="true"
+                            android:orientation="horizontal"
+
+                            android:layout_centerHorizontal="true"
+                            android:baselineAligned="true">
+
+                            <Button
+                                style="?android:attr/buttonBarButtonStyle"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/cadastro"
+                                android:id="@+id/idBtnCadastroUsuario"
+                                android:visibility="invisible"
+                                />
+
+                            <Button
+                                style="?android:attr/buttonBarButtonStyle"
+                                android:id="@+id/idBtnExcluirAmigo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/txt_Btn_ExcluirAmigo"
+                                android:visibility="invisible"/>
+                            />
+                            <Button
+                                style="?android:attr/buttonBarButtonStyle"
+                                android:id="@+id/idBtnObterListaAmigo"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/obterListaAmigo"
+                                android:visibility="invisible"
+                                android:layout_gravity="bottom"
+                                android:elegantTextHeight="false" />
+
+                        </LinearLayout>
+
+
+                    </RelativeLayout>
+
+                </FrameLayout>
+
+
+            </LinearLayout>
+
+        </TabHost>
+    </RelativeLayout>
+
+    <!--Perfil-->
+
+
+</RelativeLayout>

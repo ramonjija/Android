@@ -23,12 +23,13 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher_geladeira_verde"
         android:label="@string/app_name"
-        android:theme="@style/CustomActionTheme" >
+        android:theme="@style/AppTheme" >
         <activity
             android:screenOrientation="portrait"
             android:name=".MainActivity"
             android:label="@string/app_name"
-            android:windowSoftInputMode="adjustResize" >
+            android:theme="@style/AppTheme"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +39,9 @@
         <activity
             android:screenOrientation="portrait"
             android:name=".CadastroUsuarioActivity"
-            android:label="@string/title_activity_cadastro_usuario" >
+            android:label="@string/title_activity_cadastro_usuario"
+            android:parentActivityName=".MainActivity"
+            >
         </activity>
     </application>
 

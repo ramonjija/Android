@@ -1,124 +1,165 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
     android:layout_height="match_parent" android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     style="?android:attr/buttonBarStyle"
+    android:fitsSystemWindows="true"
     tools:context="ramonsilva.controledegeladeira.CadastroUsuarioActivity">
-
-    <EditText
+-->
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true"
+    android:id="@+id/idDrawerLayout"
+    style="?android:attr/buttonBarStyle"
+    tools:context="ramonsilva.controledegeladeira.CadastroUsuarioActivity">
+    <RelativeLayout
+        android:id="@+id/idRelLayToolbar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/idEditTextNomeUsuario"
-        android:inputType="text"
-        android:layout_below="@+id/textView"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <EditText
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:inputType="textPassword"
-        android:ems="10"
-        android:id="@+id/idEditTextSenhaUsuario"
-        android:layout_below="@+id/textView2"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:id="@+id/textView"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:text="@string/lbl_txt_nomeUsuario" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="@string/Senha"
-        android:id="@+id/textView2"
-        android:layout_marginTop="24dp"
-        android:layout_below="@+id/idEditTextNomeUsuario"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
-
-    <RadioGroup
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:weightSum="1"
-        android:orientation="vertical"
-        android:checkedButton="@+id/idRadBtnLogar"
-        android:id="@+id/idRadioGroupCadastroUsuario"
-        android:gravity="center"
-        android:layout_centerVertical="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true">
-
-        <RadioButton
-            android:layout_width="wrap_content"
+        >
+        <android.support.v7.widget.Toolbar xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/idToolbar"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/logar_texto"
-            android:id="@+id/idRadBtnLogar"
-            android:layout_gravity="center_vertical"
-            android:singleLine="true" />
+            android:theme="@style/ThemeOverlay.AppCompat.Dark"
+            android:background="@color/material_deep_teal_500"
+            android:elevation="4dp"
+            >
+        </android.support.v7.widget.Toolbar>
+    </RelativeLayout>
 
-        <RadioButton
-            android:layout_width="wrap_content"
-            android:layout_height="52dp"
-            android:text="@string/textoCadastroUsuario"
-            android:id="@+id/idRadBtnUsuario"
-            android:layout_gravity="center_vertical"
-            android:singleLine="true" />
-
-        <RadioButton
-            android:layout_width="180dp"
-            android:layout_height="wrap_content"
-            android:text="@string/textoCadastrarAmigo"
-            android:id="@+id/idRadBtnCadastroAmigo"
-            android:layout_gravity="center_vertical"
-            android:singleLine="true" />
-
-    </RadioGroup>
 
     <RelativeLayout
-        android:orientation="vertical"
+        android:layout_below="@+id/idRelLayToolbar"
+        android:id="@+id/idRelLayTelaPrincipal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:id="@+id/idRelativeLayout">
+        android:layout_height="match_parent"
+        android:paddingLeft="@dimen/activity_horizontal_margin"
+        android:paddingRight="@dimen/activity_horizontal_margin"
+        android:paddingTop="@dimen/activity_vertical_margin"
+        android:paddingBottom="@dimen/activity_vertical_margin"
+        style="?android:attr/buttonBarStyle"
+        >
 
-        <Button
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/txt_Btn_Logar"
-            android:id="@+id/idBtnSalvarUsuario"
-            android:layout_above="@+id/idBtnVoltar"
-            android:layout_centerHorizontal="true"
-            style="?android:attr/buttonBarButtonStyle"
-            android:layout_gravity="center_horizontal" />
+            android:id="@+id/idEditTextNomeUsuario"
+            android:inputType="text"
+            android:layout_below="@+id/textView"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
-        <Button
-            style="?android:attr/buttonBarButtonStyle"
+        <EditText
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Voltar"
-            android:id="@+id/idBtnVoltar"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/idEditTextSenhaUsuario"
+            android:layout_below="@+id/textView2"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/textView"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:text="@string/lbl_txt_nomeUsuario" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="@string/Senha"
+            android:id="@+id/textView2"
+            android:layout_marginTop="24dp"
+            android:layout_below="@+id/idEditTextNomeUsuario"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:weightSum="1"
+            android:orientation="vertical"
+            android:checkedButton="@+id/idRadBtnLogar"
+            android:id="@+id/idRadioGroupCadastroUsuario"
+            android:gravity="center"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true">
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/logar_texto"
+                android:id="@+id/idRadBtnLogar"
+                android:layout_gravity="center_vertical"
+                android:singleLine="true" />
+
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="52dp"
+                android:text="@string/textoCadastroUsuario"
+                android:id="@+id/idRadBtnUsuario"
+                android:layout_gravity="center_vertical"
+                android:singleLine="true" />
+
+            <RadioButton
+                android:layout_width="180dp"
+                android:layout_height="wrap_content"
+                android:text="@string/textoCadastrarAmigo"
+                android:id="@+id/idRadBtnCadastroAmigo"
+                android:layout_gravity="center_vertical"
+                android:singleLine="true" />
+
+        </RadioGroup>
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
-            android:visibility="visible"
-            android:clickable="false"
-            android:layout_gravity="center_horizontal" />
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:id="@+id/idRelativeLayout">
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/txt_Btn_Logar"
+                android:id="@+id/idBtnSalvarUsuario"
+                android:layout_above="@+id/idBtnVoltar"
+                android:layout_centerHorizontal="true"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_gravity="center_horizontal" />
+
+            <Button
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Voltar"
+                android:id="@+id/idBtnVoltar"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:visibility="visible"
+                android:clickable="false"
+                android:layout_gravity="center_horizontal" />
+        </RelativeLayout>
+
+
     </RelativeLayout>
+
 
 </RelativeLayout>

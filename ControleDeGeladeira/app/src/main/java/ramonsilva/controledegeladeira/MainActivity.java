@@ -6,20 +6,26 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
@@ -42,8 +48,7 @@ import com.parse.ParseObject;
 import com.parse.ParseQuery;
 
 import android.os.Handler;
-
-
+import android.support.v7.widget.Toolbar;
 
 
 public class MainActivity extends ActionBarActivity implements View.OnClickListener{
@@ -63,34 +68,28 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private String nomeAlimento = null;
     private String qntAlimento = null;
     private Button botaoSalvarLista = null;
-
     private Button botaosalvarAlimento = null;
-
     private Button botaoObterListaAmigo = null;
-
     private List<Usuario> amigos = new ArrayList<Usuario>();
     private Usuario amigoSelecionado = null;
     private Usuario usuario;
-
     private Button botaoCadastrarUsuario = null;
-
     private Context contexto = null;
-
     private Button botaoExcluirAmigo = null;
-
     private RadioGroup rdoGroupModal = null;
     private RadioButton rdoBtnKg = null;
     private RadioButton rdoBtnG = null;
     private RadioButton rdoBtnLitro = null;
     private RadioButton rdoBtnUnidade = null;
     private String tipo = "Unidade(s)";
-
     private ListView lista = null;
-
     private String idUsuario = null;
-
     private TextView txtViewUsuario = null;
     private TextView txtViewIdUsuario = null;
+    private DrawerLayout mDrawerLayout = null;
+    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    ListView mDrawerList = null;
+
 
     private boolean VerificarConexao(){
         boolean conectado = false;
@@ -321,7 +320,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         }
     }
-    //TODO: Criar metodo para salvar a lista (Atualizada) de amigos após exclusão
 
     private void ObterAlimentosAmigos () {
         new AlertDialog.Builder(this)
@@ -528,6 +526,71 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
+
+    class NavItem {
+        String mTitle;
+        String mSubtitle;
+        int mIcon;
+
+        public NavItem(String title, String subtitle, int icon){
+            mTitle = title;
+            mSubtitle = subtitle;
+            mIcon = icon;
+        }
+    }
+
+    class DrawerListAdapter extends BaseAdapter{
+        Context mContext;
+        ArrayList<NavItem> mNavItems;
+
+        public DrawerListAdapter(Context context, ArrayList<NavItem> navItems){
+            mContext = context;
+            mNavItems = navItems;
+        }
+
+        @Override
+        public int getCount() {
+            return mNavItems.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mNavItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view;
+
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.drawer_item, null);
+            }
+            else {
+                view = convertView;
+            }
+
+            TextView titleView = (TextView) view.findViewById(R.id.title);
+            TextView subtitleView = (TextView) view.findViewById(R.id.subTitle);
+            ImageView iconView = (ImageView) view.findViewById(R.id.icon);
+
+            titleView.setText( mNavItems.get(position).mTitle );
+            subtitleView.setText( mNavItems.get(position).mSubtitle );
+            iconView.setImageResource(mNavItems.get(position).mIcon);
+
+
+
+            return view;
+        }
+    }
+
+
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -537,6 +600,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         switch(v.getId()) {
+
             case R.id.idBtnSalvar:
 
                 InserirAlimento();
@@ -606,21 +670,37 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        android.support.v7.app.ActionBar actionBar = getSupportActionBar();
+       /* android.support.v7.app.ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         //actionBar.setDisplayShowHomeEnabled(true);
         //actionBar.setDisplayHomeAsUpEnabled(true);
         //actionBar.setIcon(R.mipmap.ic_launcher_geladeira_verde);
-        actionBar.setHomeButtonEnabled(true);
-        actionBar.setDisplayShowHomeEnabled(true);
+        actionBar.setDisplayHomeAsUpEnabled(false);*/
 
 
-
-        /*String idUsuarioLogado = ObterIdUsuario();
-        txtViewUsuario = (TextView)findViewById(R.id.txtViewUsuarioLogado);
+        String idUsuarioLogado = ObterIdUsuario();
+        txtViewUsuario = (TextView)findViewById(R.id.idTxtViewUserNameDrawer);
         txtViewUsuario.setText(ObterNomeUsuario(idUsuarioLogado));
-        txtViewIdUsuario = (TextView)findViewById(R.id.txtViewUsuarioID);
-        txtViewIdUsuario.setText(idUsuarioLogado);*/
+        txtViewIdUsuario = (TextView)findViewById(R.id.idTxtViewUserIDDrawer);
+        txtViewIdUsuario.setText(idUsuarioLogado);
+
+
+       Toolbar toolbar = (Toolbar)findViewById(R.id.idToolbar);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.idDrawerLayout);
+
+
+       setSupportActionBar(toolbar);
+
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
+        mNavItems.add(new NavItem("Home", "Volta para Home", 0));
+        mNavItems.add(new NavItem("Logout", "Realizar logout da conta", 0));
+
+        mDrawerList = (ListView) findViewById(R.id.left_drawer);
+        DrawerListAdapter drawerListAdapter = new DrawerListAdapter(this, mNavItems);
+
+        mDrawerList.setAdapter(drawerListAdapter);
 
         TabHost tab = (TabHost)findViewById(R.id.tabHost);
         tab.setup();
@@ -823,17 +903,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         botaoMais.setOnTouchListener(new View.OnTouchListener() {
             private Handler mHandler;
+
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                switch (event.getAction()){
+                switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
-                        if(mHandler != null)
+                        if (mHandler != null)
                             return true;
                         mHandler = new Handler();
                         mHandler.postDelayed(mAction, 300);
                         break;
                     case MotionEvent.ACTION_UP:
-                        if(mHandler == null)
+                        if (mHandler == null)
                             return true;
                         mHandler.removeCallbacks(mAction);
                         mHandler = null;
@@ -848,9 +929,23 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 public void run() {
                     AlterarQuantidade(+1);
                     mHandler.postDelayed(this, 300);
-                };
+                }
+
+                ;
             };
         });
+
+        mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                selectItemFromDrawer(position);
+            }
+        });
+
+    }
+
+    private void selectItemFromDrawer(int position) {
+
 
     }
 
@@ -875,6 +970,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         switch(id){
             case android.R.id.home:{
                 //aparece e desaparece o menu
+
                 return true;
             }
             default:
@@ -888,6 +984,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected void onPause() {
         super.onPause();
     }
+
+
 
 }
 
