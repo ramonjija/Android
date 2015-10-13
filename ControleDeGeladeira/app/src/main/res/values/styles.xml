@@ -2,9 +2,10 @@
 
     <!-- Base application theme. -->
 
-    <style name="AppTheme" parent="Theme.AppCompat.Light">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:statusBarColor">#00796B</item>
     </style>
     <!--<style name="AppTheme" parent="Theme.AppCompat.Light">
         <item name="android:windowNoTitle">true</item>

@@ -319,41 +319,77 @@
             android:id="@+id/idRelLayUserNameId"
             android:layout_height="150dp"
             android:layout_width="280dp"
-            android:background="#00BFA5"
+            android:background="#009688"
             >
 
-
-            <TextView
-                android:paddingTop="10dp"
-                android:paddingLeft="5dp"
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Não Logado"
-                android:id="@+id/idTxtViewUserNameDrawer" />
+                android:src="@drawable/ic_launcher_geladeira_verde"
+                android:paddingTop="5dp"
+                android:layout_alignParentTop="true"
+                android:layout_centerInParent="true"
+                android:id="@+id/idImgViewIcon"
+                />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:id="@+id/idTxtViewUserIDDrawer"
-                android:layout_below="@+id/idTxtViewUserNameDrawer"
-                android:paddingTop="10dp"
+                android:layout_below="@+id/idImgViewIcon"
+                android:paddingTop="2dp"
                 android:paddingLeft="5dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentStart="true" />
+                android:text="Usuário: "
+                android:textColor="#FFFFFF"
+                android:id="@+id/idTxtViewUsuarioControl" />
 
+            <TextView
+                android:paddingTop="2dp"
+                android:paddingLeft="5dp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/idImgViewIcon"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_toRightOf="@+id/idTxtViewUsuarioControl"
+                android:textColor="#FFFFFF"
+                android:text="Não Logado"
+                android:id="@+id/idTxtViewNomeUsuarioDrawer"
+                />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingTop="5dp"
+                android:paddingLeft="5dp"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:layout_below="@+id/idTxtViewUsuarioControl"
+                android:text="ID: "
+                android:textColor="#FFFFFF"
+                android:id="@+id/idTxtViewIdUsusarioControl" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textColor="#FFFFFF"
+                android:id="@+id/idTxtViewUserIDDrawer"
+                android:layout_toRightOf="@+id/idTxtViewIdUsusarioControl"
+                android:layout_below="@+id/idTxtViewNomeUsuarioDrawer"
+                android:paddingTop="5dp"
+                android:paddingLeft="5dp"
                 />
         </RelativeLayout>
         <ListView
             android:layout_below="@+id/idRelLayUserNameId"
-            android:id="@+id/left_drawer"
+            android:id="@+id/idItemsOnDrawer"
             android:layout_width="280dp"
             android:layout_height="match_parent"
             android:choiceMode="singleChoice"
             android:divider="@android:color/transparent"
             android:dividerHeight="0dp"
-            android:background="#006064"/>
+            android:background="@color/background_floating_material_light"
+           />
 
 
     </RelativeLayout>

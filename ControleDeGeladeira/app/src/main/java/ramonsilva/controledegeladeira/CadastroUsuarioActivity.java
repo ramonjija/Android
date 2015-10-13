@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.parse.FindCallback;
@@ -59,6 +60,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     private String idUsuarioLogado = null;
     private boolean cadastrouAmigo = false;
     public static boolean EntrouSemLogar = false;
+    private TextView txtViewSenha = null;
 
     private void PassarParametroEiniciarActivity(Intent i){
         i = new Intent(getApplicationContext(), MainActivity.class);
@@ -172,6 +174,8 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         setContentView(R.layout.activity_cadastro_usuario);
         //TODO: Verificar o erro ao cadastrar amigo pela primeira vez;
 
+        txtViewSenha = (TextView)findViewById(R.id.idTxtViewSenha);
+
         Toolbar toolbar = (Toolbar)findViewById(R.id.idToolbar);
         setSupportActionBar(toolbar);
 
@@ -200,6 +204,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             botaoVoltar.setText("Voltar");
             botaoVoltar.setOnClickListener(this);
             botaoSalvarUsuario.setText("Adicionar");
+            txtViewSenha.setText("ID:");
         }else{
             rdoBtnSalvarAmigos.setChecked(false);
             rdoBtnSalvarAmigos.setEnabled(false);
@@ -207,6 +212,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             botaoVoltar.setClickable(true);
             botaoVoltar.setText("Entrar Sem Logar");
             botaoVoltar.setOnClickListener(this);
+            txtViewSenha.setText("Senha:");
         }
 
 

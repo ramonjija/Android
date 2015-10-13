@@ -26,4 +26,6 @@
     <string name="txt_btn_Voltar">Voltar</string>
     <string name="txt_Btn_ExcluirAmigo">Excluir</string>
     <string name="lbl_txt_nomeUsuario">Usuário:</string>
+    <string name="drawer_open_content_desc">Open</string>
+    <string name="drawer_close_content_desc">Closed</string>
 </resources>

@@ -6,11 +6,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -89,6 +91,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private DrawerLayout mDrawerLayout = null;
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
     ListView mDrawerList = null;
+    ActionBarDrawerToggle mDrawerToggle;
 
 
     private boolean VerificarConexao(){
@@ -514,6 +517,37 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
+    private void RealizaLoginOuAdicionaAmigo(Intent activity){
+        SalvarListaOffline(false);
+        CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
+        finish();
+        startActivity(activity);
+    }
+
+    private void RealizaLogoff(){
+
+
+        SharedPreferences listaAlimetosPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorListaAlimento = listaAlimetosPrefs.edit();
+
+        prefEditorListaAlimento.clear();
+        prefEditorListaAlimento.commit();
+
+        SharedPreferences UsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorUser = UsuarioPref.edit();
+        prefEditorUser.clear();
+        prefEditorUser.commit();
+
+
+        SharedPreferences listaUserPref = getSharedPreferences("prefListaUsuarios",Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorListaUsuario = listaUserPref.edit();
+        prefEditorListaUsuario.clear();
+        prefEditorListaUsuario.commit();
+
+        adapter.clear();
+
+    }
+
     private class AlimentoAdapter extends ArrayAdapter  {
             public AlimentoAdapter(){
                 super(MainActivity.this, R.layout.list_item, alimentos);
@@ -525,7 +559,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             super(MainActivity.this, R.layout.list_item, amigos);
         }
     }
-
 
     class NavItem {
         String mTitle;
@@ -588,8 +621,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             return view;
         }
     }
-
-
 
     @Override
     public void onBackPressed() {
@@ -670,16 +701,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-       /* android.support.v7.app.ActionBar actionBar = getSupportActionBar();
-        assert actionBar != null;
-        //actionBar.setDisplayShowHomeEnabled(true);
-        //actionBar.setDisplayHomeAsUpEnabled(true);
-        //actionBar.setIcon(R.mipmap.ic_launcher_geladeira_verde);
-        actionBar.setDisplayHomeAsUpEnabled(false);*/
-
+        final Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
 
         String idUsuarioLogado = ObterIdUsuario();
-        txtViewUsuario = (TextView)findViewById(R.id.idTxtViewUserNameDrawer);
+        txtViewUsuario = (TextView)findViewById(R.id.idTxtViewNomeUsuarioDrawer);
         txtViewUsuario.setText(ObterNomeUsuario(idUsuarioLogado));
         txtViewIdUsuario = (TextView)findViewById(R.id.idTxtViewUserIDDrawer);
         txtViewIdUsuario.setText(idUsuarioLogado);
@@ -688,17 +713,27 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
        Toolbar toolbar = (Toolbar)findViewById(R.id.idToolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.idDrawerLayout);
 
-
-       setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        mNavItems.add(new NavItem("Home", "Volta para Home", 0));
-        mNavItems.add(new NavItem("Logout", "Realizar logout da conta", 0));
 
-        mDrawerList = (ListView) findViewById(R.id.left_drawer);
-        DrawerListAdapter drawerListAdapter = new DrawerListAdapter(this, mNavItems);
+        mDrawerToggle = new ActionBarDrawerToggle(this,
+                mDrawerLayout,toolbar,
+                R.string.drawer_open_content_desc,
+                R.string.drawer_close_content_desc);
+
+        mNavItems.add(new NavItem("Lista de Alimentos", "Ver minha lista de alimentos", R.drawable.ic_action_view_as_list));
+        if(idUsuarioLogado.equals("Inexistente")) {
+            mNavItems.add(new NavItem("Login", "Realizar login da conta", R.drawable.ic_action_person));
+        }else {
+            mNavItems.add(new NavItem("Adicionar Amigo", "Adicionar Amigo à lista de amigos", R.drawable.ic_action_add_person));
+            mNavItems.add(new NavItem("Lista de Amigos", "Ver minha lista de amigos", R.drawable.ic_action_group));
+            mNavItems.add(new NavItem("Logout", "Realizar logout da conta", R.drawable.ic_action_undo));
+        }
+        mDrawerList = (ListView) findViewById(R.id.idItemsOnDrawer);
+        final DrawerListAdapter drawerListAdapter = new DrawerListAdapter(this, mNavItems);
 
         mDrawerList.setAdapter(drawerListAdapter);
 
@@ -936,16 +971,31 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         });
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            TabHost tab = (TabHost)findViewById(R.id.tabHost);
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItemFromDrawer(position);
+                switch(position){
+                    case 0:
+                        tab.setCurrentTab(0);
+                        mDrawerLayout.closeDrawers();
+                        break;
+                    case 1:
+                        RealizaLoginOuAdicionaAmigo(cadastroActivity);
+                        break;
+                    case 2:
+                        tab.setCurrentTab(2);
+                        mDrawerLayout.closeDrawers();
+                        break;
+                    case 3:
+                        RealizaLogoff();
+                        RealizaLoginOuAdicionaAmigo(cadastroActivity);
+                        break;
+
+
+                }
+
             }
         });
-
-    }
-
-    private void selectItemFromDrawer(int position) {
-
 
     }
 
@@ -985,8 +1035,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onPause();
     }
 
+    @Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        mDrawerToggle.syncState();
+    }
 
-
+    @Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 }
 
 
