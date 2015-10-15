@@ -426,7 +426,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 obj = new JSONObject();
                 try {
                     obj.put("nomeUsuario", usuario.getNome());
-                    obj.put("senhaUsuario", usuario.getSenha());
+                    obj.put("idUsuario", usuario.getSenha());
 
                     array.put(obj);
                 } catch (JSONException je) {
@@ -470,7 +470,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     obj = array.getJSONObject(i);
                     usuario = new Usuario();
                     usuario.setNome(obj.getString("nomeUsuario"));
-                    usuario.setSenha(obj.getString("senhaUsuario"));
+                    usuario.setSenha(obj.getString("idUsuario"));
 
                     amigos.add(usuario);
 

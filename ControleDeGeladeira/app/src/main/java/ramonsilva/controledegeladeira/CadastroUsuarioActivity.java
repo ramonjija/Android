@@ -11,6 +11,8 @@ import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -205,6 +207,9 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             botaoVoltar.setOnClickListener(this);
             botaoSalvarUsuario.setText("Adicionar");
             txtViewSenha.setText("ID:");
+            EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
+            txtSenha.setInputType(InputType.TYPE_CLASS_TEXT);
+
         }else{
             rdoBtnSalvarAmigos.setChecked(false);
             rdoBtnSalvarAmigos.setEnabled(false);
@@ -213,6 +218,8 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             botaoVoltar.setText("Entrar Sem Logar");
             botaoVoltar.setOnClickListener(this);
             txtViewSenha.setText("Senha:");
+            EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
+            txtSenha.setTransformationMethod(PasswordTransformationMethod.getInstance());
         }
 
 
@@ -355,7 +362,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                 //Passo 1:
                                 final ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
                                 queryAmigo.whereEqualTo("nome", nome);
-                                queryAmigo.whereEqualTo("senha", senha);
+                                queryAmigo.whereEqualTo("objectId", senha);
 
                                 queryAmigo.findInBackground(new FindCallback<ParseObject>() {
                                     @Override
@@ -379,7 +386,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                 obj = new JSONObject();
                                                 try {
                                                     obj.put("nomeUsuario", usuario.getNome());
-                                                    obj.put("senhaUsuario", usuario.getSenha());
+                                                    obj.put("idUsuario", usuario.getSenha());
 
                                                     array.put(obj);
                                                 } catch (JSONException je) {
