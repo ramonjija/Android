@@ -1,19 +1,18 @@
 package ramonsilva.controledegeladeira;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
-import android.support.v4.widget.DrawerLayout;
+import android.os.AsyncTask;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.text.method.PasswordTransformationMethod;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,16 +20,12 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.parse.FindCallback;
-import com.parse.GetCallback;
 import com.parse.ParseException;
 import com.parse.ParseObject;
 import com.parse.ParseQuery;
-import com.parse.SaveCallback;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
+import android.os.Handler;
 
 public class CadastroUsuarioActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -64,16 +60,16 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     public static boolean EntrouSemLogar = false;
     private TextView txtViewSenha = null;
 
-    private void PassarParametroEiniciarActivity(Intent i){
+    private void PassarParametroEiniciarActivity(Intent i) {
         i = new Intent(getApplicationContext(), MainActivity.class);
-        i.putExtra("ParseIniciado","sim");
+        i.putExtra("ParseIniciado", "sim");
         finish();
         startActivity(i);
     }
 
-    private void AceitarTermosSemLogin(){
+    private void AceitarTermosSemLogin() {
 
-       final Intent VoltarMain = new Intent(this, MainActivity.class);
+        final Intent VoltarMain = new Intent(this, MainActivity.class);
         new AlertDialog.Builder(this)
                 .setMessage("Ao entrar sem logar, não será possível adicionar amigos e compartilhar listas. Você tem certeza que deseja prosseguir?")
                 .setCancelable(false)
@@ -88,18 +84,14 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                 .show();
     }
 
-    private boolean VerificarSeAmigoEstaCadastrado(List<Usuario> listaDeAmigos, String nome){
+    private boolean VerificarSeAmigoEstaCadastrado(List<Usuario> listaDeAmigos, String nome) {
         boolean cadastrado = false;
 
-        if(listaDeAmigos != null)
-        {
-            if (!listaDeAmigos.isEmpty())
-            {
+        if (listaDeAmigos != null) {
+            if (!listaDeAmigos.isEmpty()) {
 
-                for (Usuario amigo : listaDeAmigos)
-                {
-                    if ((amigo.getNome()).equals(nome))
-                    {
+                for (Usuario amigo : listaDeAmigos) {
+                    if ((amigo.getNome()).equals(nome)) {
                         cadastrado = true;
                         break;
                     }
@@ -110,7 +102,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         return cadastrado;
     }
 
-    private void RecuperarListaAmigosLogado(String idUsuarioLogado){
+    private void RecuperarListaAmigosLogado(String idUsuarioLogado) {
         SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
 
@@ -124,8 +116,8 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             e.printStackTrace();
         }
 
-        for(ParseObject obj : objUsuario){
-           //prefsEditorListaAmigos.putString("Id") = obj.getObjectId();
+        for (ParseObject obj : objUsuario) {
+            //prefsEditorListaAmigos.putString("Id") = obj.getObjectId();
             prefsEditorListaAmigos.putString("idListaAmigo", obj.getObjectId());
             prefsEditorListaAmigos.commit();
             prefsEditor.putString("usuarios", obj.get("Dados").toString()).commit();
@@ -134,14 +126,14 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     }
 
-    protected void RecuperarListaDeAlimentos(String idUsuarioLogado){
+    protected void RecuperarListaDeAlimentos(String idUsuarioLogado) {
         //SharedPreferences de Alimentos
         SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
         SharedPreferences.Editor prefsEditorAlimentos = mPrefs.edit();
 
 
         ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
-        queryListaAlimento.whereEqualTo("IdUsuario",idUsuarioLogado);
+        queryListaAlimento.whereEqualTo("IdUsuario", idUsuarioLogado);
         String idAlimentosListaAmigo = null;
         List<ParseObject> objLista = null;
         try {
@@ -149,21 +141,176 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        for(ParseObject obj : objLista)
-        {
+        for (ParseObject obj : objLista) {
             prefsEditorAlimentos.putString("alimentos", obj.getString("Alimentos")).commit();
         }
 
     }
 
-    private boolean VerificarConexao(){
+    private void RealizarCadastroSincrono(String nome, String senha) {
+
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            ParseQuery<ParseObject> queryUsuario = ParseQuery.getQuery("Usuario");
+            queryUsuario.whereEqualTo("nome", nome);
+            try {
+                ParseObject objUsuario = queryUsuario.getFirst();
+                //Toast.makeText(getApplicationContext(), "Usuario ja cadastrado", Toast.LENGTH_SHORT).show();
+                mensagem = "Usuario ja cadastrado";
+                prefsEditor.putString("idUsuario", objUsuario.getObjectId()).commit();
+
+            } catch (ParseException p) {//nao encontrou usuario cadastra-lo
+                p.printStackTrace();
+                ParseObject usuarioCadastrar = new ParseObject("Usuario");
+                usuarioCadastrar.put("nome", nome);
+                usuarioCadastrar.put("senha", senha);
+                try {//implementar o cadastro
+                    usuarioCadastrar.save();
+                    //Toast.makeText(getApplicationContext(), "Usuário cadastrado com sucesso ;)", Toast.LENGTH_SHORT).show();
+                    mensagem = "Usuário cadastrado com sucesso ;)";
+                    prefsEditor.putString("idUsuario", usuarioCadastrar.getObjectId());
+                    prefsEditor.commit();
+                    rdoBtnSalvarUsuario.setEnabled(false);
+                    rdoBtnSalvarUsuario.setChecked(false);
+                    rdoBtnLogarUsuario.setEnabled(false);
+                    rdoBtnLogarUsuario.setChecked(false);
+                    rdoBtnSalvarAmigos.setChecked(true);
+                    cadastroUsuario = false;
+                    PassarParametroEiniciarActivity(i);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    //Toast.makeText(getApplicationContext(), "Ocorreu um erro ao cadastrar o usuário", Toast.LENGTH_SHORT).show();
+                    mensagem = "Ocorreu um erro ao cadastrar o usuário";
+
+                }
+            }
+    }
+
+    private void RealizarCadastroAmigoSincrono(String nome, String senha) {
+        if (!nome.equals("") && !senha.equals("")) {
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            usuario = new Usuario(nome, senha);
+            if (listaDeUsuarios == null) {
+                listaDeUsuarios = new ArrayList<Usuario>();
+            }
+            if (!VerificarSeAmigoEstaCadastrado(listaDeUsuarios, nome)) {
+                listaDeUsuarios.add(usuario);
+                ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
+                queryAmigo.whereEqualTo("nome", nome);
+                queryAmigo.whereEqualTo("objectId", senha);
+                try {//encontrou amigo
+                    ParseObject objAmigo = queryAmigo.getFirst();
+                    SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+                    SharedPreferences.Editor prefsEditor = mPrefs.edit();
+
+                    JSONArray array = new JSONArray();
+                    JSONObject obj;
+
+                    for (Usuario usuario : listaDeUsuarios) {
+                        obj = new JSONObject();
+                        try {
+                            obj.put("nomeUsuario", usuario.getNome());
+                            obj.put("idUsuario", usuario.getSenha());
+
+                            array.put(obj);
+                        } catch (JSONException je) {
+                            je.printStackTrace();
+                        }
+                    }
+                    final String arrayStr = array.toString();//VERIFICAR
+                    prefsEditor.putString("usuarios", arrayStr).commit();
+
+                    if (idListaAmigos.getString("idListaAmigo", "ListaInexistente").equals("ListaInexistente")) {
+
+                        ParseObject listaDeAmigos = new ParseObject("ListaDeAmigos");
+                        listaDeAmigos.put("IdUsuario", idUsuario.getString("idUsuario", "Inexistente"));// idUsuario.getString("IdUsuario", "Inexistente"));
+                        listaDeAmigos.put("Dados", arrayStr);
+                        try {
+                            listaDeAmigos.save();
+                            prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
+                            prefsEditorListaAmigos.commit();
+                            Toast.makeText(getApplicationContext(), "Amigo adicionado com sucesso", Toast.LENGTH_SHORT).show();
+                            PassarParametroEiniciarActivity(i);
+
+                        } catch (ParseException p) {
+                            p.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Ocorreu um erro ao adicionar o amigo :(", Toast.LENGTH_SHORT).show();
+                        }
+                    } else {//lista existe dar update
+
+                        String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
+                        ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
+                        ParseObject listaDeamigos = queryAmigoUpdate.getFirst();
+                        listaDeamigos.put("Dados", arrayStr);
+                        try {
+                            listaDeamigos.save();
+                            Toast.makeText(getApplicationContext(), "Lista de amigos atualizada com sucesso", Toast.LENGTH_SHORT).show();
+                            PassarParametroEiniciarActivity(i);
+                        } catch (ParseException p) {
+                            p.printStackTrace();
+                            Toast.makeText(getApplicationContext(), "Ocorreu um erro ao atualizar a lista de amigos :(", Toast.LENGTH_SHORT).show();
+                        }
+                    }
+
+                } catch (ParseException p) {//Nao encontrou amigo
+                    p.printStackTrace();
+                    mensagem =  "Amigo não encontrado";
+                }
+            } else {
+                mensagem = "Amigo já adicionado";
+            }
+        }else{
+            mensagem = "Usuario e ID devem ser preenchidos";
+        }
+    }
+
+    private void RealizarLoginSincrono(String nome, String senha) {
+
+            Intent i = new Intent(getApplicationContext(), MainActivity.class);
+            ParseQuery<ParseObject> queryLogin = ParseQuery.getQuery("Usuario");
+            queryLogin.whereEqualTo("nome", nome);
+            queryLogin.whereEqualTo("senha", senha);
+            List<ParseObject> objUsuario = null;
+            try {
+                objUsuario = queryLogin.find();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            for (ParseObject obj : objUsuario) {
+                idUsuarioLogado = obj.getObjectId();
+
+            }
+            if (idUsuarioLogado != null) {
+                String idListaAlimento = null;
+                prefsEditor.putString("idUsuario", idUsuarioLogado);
+                prefsEditor.commit();
+                mensagem = "Logado! ;)";
+
+                RecuperarListaAmigosLogado(idUsuarioLogado);
+                RecuperarListaDeAlimentos(idUsuarioLogado);
+
+                rdoBtnSalvarUsuario.setEnabled(false);
+                rdoBtnSalvarUsuario.setChecked(false);
+                rdoBtnLogarUsuario.setEnabled(false);
+                rdoBtnLogarUsuario.setChecked(false);
+                rdoBtnSalvarAmigos.setEnabled(true);
+                rdoBtnSalvarAmigos.setChecked(true);
+                cadastroUsuario = false;
+                logarUsuario = false;
+
+                PassarParametroEiniciarActivity(i);
+            } else {
+                mensagem = "Nome ou Senha incorretos";
+            }
+    }
+
+    private boolean VerificarConexao() {
         boolean conectado = false;
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager.getActiveNetworkInfo() != null) {
-            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null) {
+            if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
 
                 conectado = true;
-            }else if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()){
+            } else if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()) {
                 conectado = true;
             }
         }
@@ -176,9 +323,12 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         setContentView(R.layout.activity_cadastro_usuario);
         //TODO: Verificar o erro ao cadastrar amigo pela primeira vez;
 
-        txtViewSenha = (TextView)findViewById(R.id.idTxtViewSenha);
+        //Preparando o process dialog
+        //
 
-        Toolbar toolbar = (Toolbar)findViewById(R.id.idToolbar);
+        txtViewSenha = (TextView) findViewById(R.id.idTxtViewSenha);
+
+        Toolbar toolbar = (Toolbar) findViewById(R.id.idToolbar);
         setSupportActionBar(toolbar);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -210,7 +360,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
             txtSenha.setInputType(InputType.TYPE_CLASS_TEXT);
 
-        }else{
+        } else {
             rdoBtnSalvarAmigos.setChecked(false);
             rdoBtnSalvarAmigos.setEnabled(false);
             botaoVoltar.setVisibility(View.VISIBLE);
@@ -240,7 +390,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                     cadastroUsuario = false;
                     logarUsuario = true;
                     botaoSalvarUsuario.setText("LOGAR");
-                }else if(checkedId == R.id.idRadBtnUsuario){
+                } else if (checkedId == R.id.idRadBtnUsuario) {
                     botaoSalvarUsuario.setText("CADASTRAR");
                 }
 
@@ -254,11 +404,11 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
     @Override
     public void onBackPressed() {
 
-        if(!rdoBtnLogarUsuario.isEnabled() && !rdoBtnSalvarUsuario.isEnabled()){
-                Intent i = new Intent(this, MainActivity.class);
-                finish();
-                startActivity(i);
-                super.onBackPressed();
+        if (!rdoBtnLogarUsuario.isEnabled() && !rdoBtnSalvarUsuario.isEnabled()) {
+            Intent i = new Intent(this, MainActivity.class);
+            finish();
+            startActivity(i);
+            super.onBackPressed();
 
         }
     }
@@ -279,13 +429,39 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                 break;
 
             case R.id.idBtnSalvarUsuario:
-                Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
-                if (VerificarConexao()) {
-                    Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
-                    EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
-                    EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
-                    nome = txtNome.getText().toString();
-                    senha = txtSenha.getText().toString();
+                Toast.makeText(getApplicationContext(), "aguarde...", Toast.LENGTH_SHORT).show();
+                EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
+                EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
+                nome = txtNome.getText().toString();
+                senha = txtSenha.getText().toString();
+                if (!nome.equals("") && !senha.equals("")) {
+                    if (VerificarConexao()) {
+                        if (rdoBtnSalvarUsuario.isChecked()) {
+                            RealizarCadastroSincrono(nome, senha);
+                        } else if (rdoBtnSalvarAmigos.isChecked()) {
+                            RealizarCadastroAmigoSincrono(nome, senha);
+                        } else if (rdoBtnLogarUsuario.isChecked()) {
+                            RealizarLoginSincrono(nome, senha);
+                        }
+                        txtNome.setText("");
+                        txtSenha.setText("");
+                    } else {
+                        mensagem = "Não há conexão com a internet";
+                    }
+
+                }else{
+                    mensagem = "Os campos devem ser preenchidos";
+                }
+                Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_LONG).show();
+
+                break;
+
+            default:
+                break;
+        }
+
+        //Assincrono
+                    /*
                     if (!nome.equals("") && !senha.equals("")) {
                         mensagem = "Aguarde...";
                         final Intent i = new Intent(getApplicationContext(), MainActivity.class);
@@ -348,7 +524,11 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                 ex.getMessage();
                                 Toast.makeText(getApplicationContext(), "Nao foi possivel cadastrar esse usuario", Toast.LENGTH_SHORT).show();
                             }
+                            */
+        //Fim cadastro assincrono
 
+        //Inicio Cadastro Amigo Assincrono
+                    /*
                         } else if (rdoBtnSalvarAmigos.isChecked()) {
                             Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
 
@@ -418,13 +598,6 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                                                 });
                                             } else {
 
-                                                //Lista Existe dar update
-                            /*
-                            String listObjectId = null;
-                            for (ParseObject objetos : list) {
-                                listObjectId = objetos.getObjectId();
-                            }
-                            */
                                                 String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
                                                 ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
                                                 queryAmigoUpdate.getInBackground(idListaAmigo, new GetCallback<ParseObject>() {
@@ -450,6 +623,11 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                             } else {
                                 mensagem = "Amigo já adicionado!";
                             }
+                        */
+        //Fim do cadastro de amigo asssincrono
+
+        //Inicio do login sincrono
+                    /*
                         } else if (rdoBtnLogarUsuario.isChecked()) {
                             ParseQuery<ParseObject> queryLogin = ParseQuery.getQuery("Usuario");
                             queryLogin.whereEqualTo("nome", nome);
@@ -499,9 +677,8 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                     mensagem = "Não há conexão com a internet";
                 }
                 Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_SHORT).show();
-                break;
-        }
-
+                */
+        //fim login sincrono
     }
 
     @Override
@@ -533,4 +710,5 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
         return super.onOptionsItemSelected(item);
     }
+
 }
