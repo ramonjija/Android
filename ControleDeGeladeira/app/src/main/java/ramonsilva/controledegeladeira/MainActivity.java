@@ -1,13 +1,10 @@
 package ramonsilva.controledegeladeira;
 
-import android.app.ActionBar;
-import android.app.Activity;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.os.Bundle;
 import android.support.v4.widget.DrawerLayout;
@@ -28,11 +25,9 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
-import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,6 +35,7 @@ import android.widget.Toast;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,9 +49,10 @@ import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 
 
-public class MainActivity extends ActionBarActivity implements View.OnClickListener{
+public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
     private List<Alimentos> alimentos = new ArrayList<Alimentos>();
+    private List<Alimentos> alimentosAmigos = new ArrayList<Alimentos>();
     private AlimentoAdapter adapter = null;
     private AmigosAdapter adapterAmigos = null;
     private Alimentos alimentoSelecionado = null;
@@ -92,16 +89,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
     ListView mDrawerList = null;
     ActionBarDrawerToggle mDrawerToggle;
+    private AlertDialog alerta;
 
 
-    private boolean VerificarConexao(){
+    private boolean VerificarConexao() {
         boolean conectado = false;
-        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
-        if(connectivityManager.getActiveNetworkInfo() != null) {
-            if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()){
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager.getActiveNetworkInfo() != null) {
+            if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).isConnected()) {
 
                 conectado = true;
-            }else if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()){
+            } else if (connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).isConnected()) {
                 conectado = true;
             }
         }
@@ -111,90 +109,89 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
         JSONArray ListaAlimentosObtidos = null;//
         ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
-        queryListaAlimento.whereEqualTo("objectId",idListaUsuario);
+        queryListaAlimento.whereEqualTo("objectId", idListaUsuario);
         List<ParseObject> objLista = queryListaAlimento.find();
-        for(ParseObject obj : objLista)
-        {
-            ListaAlimentosObtidos = new JSONArray((String)obj.get("Alimentos"));
+        for (ParseObject obj : objLista) {
+            ListaAlimentosObtidos = new JSONArray((String) obj.get("Alimentos"));
         }
         return ListaAlimentosObtidos;
     }
 
-    protected void SalvarLista(final boolean mostraMsg){
+    protected void SalvarLista(final boolean mostraMsg) {
 
 
-            SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
-            SharedPreferences.Editor prefsEditor = mPrefs.edit();
-            SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
-            SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
+        SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
+        SharedPreferences.Editor prefsEditor = mPrefs.edit();
+        SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
 
-            JSONArray array = new JSONArray();
-            JSONObject obj;
-            final String[] objId = new String[1];
-            final ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
-            final ParseQuery<ParseObject> query;
+        JSONArray array = new JSONArray();
+        JSONObject obj;
+        final String[] objId = new String[1];
+        final ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
+        final ParseQuery<ParseObject> query;
 
-            for(Alimentos item : alimentos){
-                obj = new JSONObject();
-                try {
-                    obj.put("nome", item.getNome());
-                    obj.put("quantidade", item.getQuantidade());
-                    obj.put("tipo", item.getTipo());
-                    array.put(obj);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
+        for (Alimentos item : alimentos) {
+            obj = new JSONObject();
+            try {
+                obj.put("nome", item.getNome());
+                obj.put("quantidade", item.getQuantidade());
+                obj.put("tipo", item.getTipo());
+                array.put(obj);
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
-            final String arrayStr = array.toString();
+        }
+        final String arrayStr = array.toString();
 
-            final String idUsuario = idUsuarioPref.getString("idUsuario", "Inexistente");
-            //idUsuario = idUsuarioPref.getString("idUsuario","Inexistente");
+        final String idUsuario = idUsuarioPref.getString("idUsuario", "Inexistente");
+        //idUsuario = idUsuarioPref.getString("idUsuario","Inexistente");
 
-            //Parse
+        //Parse
 
-            query = ParseQuery.getQuery("ListaDeAlimentos");
-            query.whereEqualTo("IdUsuario", idUsuario);
+        query = ParseQuery.getQuery("ListaDeAlimentos");
+        query.whereEqualTo("IdUsuario", idUsuario);
 
-            query.findInBackground(new FindCallback<ParseObject>() {
-                @Override
-                public void done(List<ParseObject> list, ParseException e) {
-                    if (e != null) {
-                        e.printStackTrace();
-                    } else if (list.isEmpty()) {
+        query.findInBackground(new FindCallback<ParseObject>() {
+            @Override
+            public void done(List<ParseObject> list, ParseException e) {
+                if (e != null) {
+                    e.printStackTrace();
+                } else if (list.isEmpty()) {
 
-                        alimentosParse.put("Alimentos", arrayStr);
-                        alimentosParse.put("IdUsuario", idUsuario);
-                        alimentosParse.saveInBackground();
-                        if (mostraMsg) {
-                            Toast.makeText(getApplicationContext(), "Lista salva", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        String objectId = null;
-                        for (ParseObject objetos : list) {
-                            objectId = objetos.getObjectId();
-                        }
+                    alimentosParse.put("Alimentos", arrayStr);
+                    alimentosParse.put("IdUsuario", idUsuario);
+                    alimentosParse.saveInBackground();
+                    if (mostraMsg) {
+                        Toast.makeText(getApplicationContext(), "Lista salva", Toast.LENGTH_SHORT).show();
+                    }
+                } else {
+                    String objectId = null;
+                    for (ParseObject objetos : list) {
+                        objectId = objetos.getObjectId();
+                    }
 
-                        query.getInBackground(objectId, new GetCallback<ParseObject>() {
-                            @Override
-                            public void done(ParseObject parseObject, ParseException e) {
-                                if (e == null) {
-                                    parseObject.put("Alimentos", arrayStr);
-                                    parseObject.saveInBackground();
-                                    if (mostraMsg) {
-                                        Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
-                                    }
+                    query.getInBackground(objectId, new GetCallback<ParseObject>() {
+                        @Override
+                        public void done(ParseObject parseObject, ParseException e) {
+                            if (e == null) {
+                                parseObject.put("Alimentos", arrayStr);
+                                parseObject.saveInBackground();
+                                if (mostraMsg) {
+                                    Toast.makeText(getApplicationContext(), "Lista atualizada", Toast.LENGTH_SHORT).show();
                                 }
                             }
-                        });
-                    }
+                        }
+                    });
                 }
-            });
+            }
+        });
 
         prefsEditor.putString("alimentos", arrayStr).commit();
 
     }
 
-    protected String SalvarListaOffline(boolean mostraMsg){
+    protected String SalvarListaOffline(boolean mostraMsg) {
         String arrayStr = null;
         SharedPreferences mPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = mPrefs.edit();
@@ -204,7 +201,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         JSONArray array = new JSONArray();
         JSONObject obj;
 
-        for(Alimentos item : alimentos){
+        for (Alimentos item : alimentos) {
             obj = new JSONObject();
             try {
                 obj.put("nome", item.getNome());
@@ -218,15 +215,15 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         arrayStr = array.toString();
         idUsuario = idUsuarioPref.getString("idUsuario", "Inexistente");
         prefsEditor.putString("alimentos", arrayStr).commit();
-        if(mostraMsg) {
+        if (mostraMsg) {
             Toast.makeText(getApplicationContext(), "Lista Local Salva", Toast.LENGTH_SHORT).show();
         }
         return arrayStr;
     }
 
-    protected void SalvarListaParse(String idUsuario, String arrayStr, boolean mostraMsg){
+    protected void SalvarListaParse(String idUsuario, String arrayStr, boolean mostraMsg) {
         CadastroUsuarioActivity userActivity = new CadastroUsuarioActivity();
-        if(VerificarConexao()) {
+        if (VerificarConexao()) {
             ParseObject alimentosParse = new ParseObject("ListaDeAlimentos");
             ParseQuery<ParseObject> query = ParseQuery.getQuery("ListaDeAlimentos");
             query.whereEqualTo("IdUsuario", idUsuario);
@@ -255,20 +252,19 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             } catch (ParseException e) {
                 e.printStackTrace();
             }
-        }
-        else{
-            Toast.makeText(getApplicationContext(), "Não há conexão com a internet. Lista local salva.",Toast.LENGTH_LONG).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Não há conexão com a internet. Lista local salva.", Toast.LENGTH_LONG).show();
         }
     }
 
-    protected void InserirAlimento(){
+    protected void InserirAlimento() {
 
         Alimentos alimento = new Alimentos();
-        EditText nome = (EditText)findViewById(R.id.idNome);
-        EditText quantidade = (EditText)findViewById(R.id.idQuantidade);
+        EditText nome = (EditText) findViewById(R.id.idNome);
+        EditText quantidade = (EditText) findViewById(R.id.idQuantidade);
         nomeAlimento = nome.getText().toString();
         qntAlimento = quantidade.getText().toString();
-        if(!nomeAlimento.isEmpty() && !qntAlimento.isEmpty()) {
+        if (!nomeAlimento.isEmpty() && !qntAlimento.isEmpty()) {
             alimento.setNome(nomeAlimento);
             alimento.setQuantidade(qntAlimento);
             alimento.setTipo(tipo);
@@ -280,10 +276,9 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-    protected void AlterarQuantidade(int valor){
+    protected void AlterarQuantidade(int valor) {
 
-        if(alimentoSelecionado != null)
-        {
+        if (alimentoSelecionado != null) {
 
             qnt = 0;
             qnt = Integer.valueOf(alimentoSelecionado.getQuantidade());
@@ -291,7 +286,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 adapter.remove(alimentoSelecionado);
                 alimentoSelecionado.setQuantidade(String.valueOf(qnt + valor));
                 adapter.insert(alimentoSelecionado, posicaoDoALimento);
-            }else if(valor > 0){
+            } else if (valor > 0) {
                 adapter.remove(alimentoSelecionado);
                 alimentoSelecionado.setQuantidade(String.valueOf(qnt + valor));
                 adapter.insert(alimentoSelecionado, posicaoDoALimento);
@@ -300,9 +295,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-    protected void ExcluirAlimentoLista(){
-        if(alimentoSelecionado != null)
-        {
+    protected void ExcluirAlimentoLista() {
+        if (alimentoSelecionado != null) {
 
             adapter.remove(alimentoSelecionado);
             adapter.notifyDataSetChanged();
@@ -311,20 +305,20 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    protected void ExcluirAmigoLista(){
-        if(amigoSelecionado != null){
-            if(VerificarConexao()){
-            adapterAmigos.remove(amigoSelecionado);
-            amigos.remove(amigoSelecionado);
-            AtualizaListaDeAmigos(amigos);
-            amigoSelecionado = null;
-            }else{
-                Toast.makeText(getApplicationContext(),"Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
+    protected void ExcluirAmigoLista() {
+        if (amigoSelecionado != null) {
+            if (VerificarConexao()) {
+                adapterAmigos.remove(amigoSelecionado);
+                amigos.remove(amigoSelecionado);
+                AtualizaListaDeAmigos(amigos);
+                amigoSelecionado = null;
+            } else {
+                Toast.makeText(getApplicationContext(), "Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void ObterAlimentosAmigos () {
+    private void ObterAlimentosAmigos() {
         new AlertDialog.Builder(this)
                 .setMessage("Você tem certeza que deseja substituir sua lista?")
                 .setCancelable(false)
@@ -380,15 +374,55 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 .show();
     }
 
-    protected void RecuperarListaDoJson(){
+    private List<Alimentos> ObterAlimentosAmigosParaEspiar() {
+
+        JSONArray arrayAlimentos;
+        String idListaUsuario = null;
+        try {
+            idListaUsuario = Usuario.obtemIdListaUsuario(amigoSelecionado.getNome().toString());
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        if (idListaUsuario != null) {
+            try {
+                arrayAlimentos = ObtemListaAlimentosUsuario(idListaUsuario);
+                alimentosAmigos.clear();
+                JSONObject obj;
+                Alimentos alimento;
+                for (int i = 0; i < arrayAlimentos.length(); i++) {
+                    try {
+                        obj = arrayAlimentos.getJSONObject(i);
+                        alimento = new Alimentos();
+                        alimento.setNome(obj.getString("nome"));
+                        alimento.setQuantidade(obj.getString("quantidade"));
+                        alimento.setTipo(obj.getString("tipo"));
+                        alimentosAmigos.add(alimento);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            } catch (ParseException e) {
+                e.printStackTrace();
+                alimentosAmigos.clear();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+    }else{
+            alimentosAmigos.clear();
+        }
+
+        return alimentosAmigos;
+}
+
+    protected void RecuperarListaDoJson() {
         try {
             //JSONArray array = new JSONArray(mPrefs.getString("alimentos","alimentos"));
             SharedPreferences pref = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
-            JSONArray array = new JSONArray(pref.getString("alimentos","alimentos"));
+            JSONArray array = new JSONArray(pref.getString("alimentos", "alimentos"));
             //JSONArray array = new JSONArray();
             JSONObject obj;
             Alimentos alimento;
-            for(int i =0; i<array.length(); i++){
+            for (int i = 0; i < array.length(); i++) {
                 obj = array.getJSONObject(i);
                 alimento = new Alimentos();
                 alimento.setNome(obj.getString("nome"));
@@ -411,10 +445,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         }
     }
 
-    private void AtualizaListaDeAmigos(List<Usuario> listaDeUsuarios){
+    private void AtualizaListaDeAmigos(List<Usuario> listaDeUsuarios) {
 
         CadastroUsuarioActivity userActivity = new CadastroUsuarioActivity();
-        if(VerificarConexao()) {
+        if (VerificarConexao()) {
 
             SharedPreferences mPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
             SharedPreferences.Editor prefsEditor = mPrefs.edit();
@@ -455,41 +489,41 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
             }
-        }else{
-            Toast.makeText(getApplicationContext(), "Não há conexão com a internet.",Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(getApplicationContext(), "Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
         }
 
     }
 
-    protected void RecuperarListaDeAmigosJson(){
-            try{
-                SharedPreferences aPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
-                JSONArray array = new JSONArray(aPrefs.getString("usuarios","usuarios"));
-                JSONObject obj;
-                for(int i = 0; i < array.length(); i++){
-                    obj = array.getJSONObject(i);
-                    usuario = new Usuario();
-                    usuario.setNome(obj.getString("nomeUsuario"));
-                    usuario.setSenha(obj.getString("idUsuario"));
+    protected void RecuperarListaDeAmigosJson() {
+        try {
+            SharedPreferences aPrefs = getSharedPreferences("prefListaUsuarios", MODE_PRIVATE);
+            JSONArray array = new JSONArray(aPrefs.getString("usuarios", "usuarios"));
+            JSONObject obj;
+            for (int i = 0; i < array.length(); i++) {
+                obj = array.getJSONObject(i);
+                usuario = new Usuario();
+                usuario.setNome(obj.getString("nomeUsuario"));
+                usuario.setSenha(obj.getString("idUsuario"));
 
-                    amigos.add(usuario);
+                amigos.add(usuario);
 
-                }
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
-    protected String ObterIdUsuario(){
+    protected String ObterIdUsuario() {
         SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
         SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
-        return idUsuarioPref.getString("idUsuario","Inexistente");
+        return idUsuarioPref.getString("idUsuario", "Inexistente");
     }
 
-    protected String ObterNomeUsuario(String idUsuario){
+    protected String ObterNomeUsuario(String idUsuario) {
         String nomeUsuario = "Inexistente";
         ParseQuery<ParseObject> queryNomeUser = ParseQuery.getQuery("Usuario");
-        queryNomeUser.whereEqualTo("objectId",idUsuario);
+        queryNomeUser.whereEqualTo("objectId", idUsuario);
         try {
             ParseObject objetoUser = queryNomeUser.getFirst();
             nomeUsuario = objetoUser.get("nome").toString();
@@ -500,31 +534,29 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         return nomeUsuario;
     }
 
-    protected void ChecarUsuarioCadastrado(){
+    protected void ChecarUsuarioCadastrado() {
         SharedPreferences idUsuarioPref = getSharedPreferences("Usuario", MODE_PRIVATE);
         SharedPreferences.Editor prefEditorUser = idUsuarioPref.edit();
 
-        if(idUsuarioPref.getString("idUsuario","Inexistente").equals("Inexistente") && !CadastroUsuarioActivity.EntrouSemLogar)
-        {
+        if (idUsuarioPref.getString("idUsuario", "Inexistente").equals("Inexistente") && !CadastroUsuarioActivity.EntrouSemLogar) {
             //CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
             Intent i = new Intent(this, CadastroUsuarioActivity.class);
             finish();
             startActivity(i);
-            Log.i("UsuarioCadastrado","Usuario não cadastrado. Iniciando o cadastro");
-        }
-        else{
-            Log.i("UsuarioCadastrado","Usuario Cadastrado id = " + idUsuarioPref.getString("idUsuario","Inexistente"));
+            Log.i("UsuarioCadastrado", "Usuario não cadastrado. Iniciando o cadastro");
+        } else {
+            Log.i("UsuarioCadastrado", "Usuario Cadastrado id = " + idUsuarioPref.getString("idUsuario", "Inexistente"));
         }
     }
 
-    private void RealizaLoginOuAdicionaAmigo(Intent activity){
+    private void RealizaLoginOuAdicionaAmigo(Intent activity) {
         SalvarListaOffline(false);
         CadastroUsuarioActivity.listaDeUsuariosRecebidos = amigos;
         finish();
         startActivity(activity);
     }
 
-    private void RealizaLogoff(){
+    private void RealizaLogoff() {
 
 
         SharedPreferences listaAlimetosPrefs = getSharedPreferences("prefListaAlimentos", MODE_PRIVATE);
@@ -539,7 +571,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         prefEditorUser.commit();
 
 
-        SharedPreferences listaUserPref = getSharedPreferences("prefListaUsuarios",Context.MODE_PRIVATE);
+        SharedPreferences listaUserPref = getSharedPreferences("prefListaUsuarios", Context.MODE_PRIVATE);
         SharedPreferences.Editor prefEditorListaUsuario = listaUserPref.edit();
         prefEditorListaUsuario.clear();
         prefEditorListaUsuario.commit();
@@ -547,80 +579,98 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         adapter.clear();
 
     }
-
-    private class AlimentoAdapter extends ArrayAdapter  {
-            public AlimentoAdapter(){
-                super(MainActivity.this, R.layout.list_item, alimentos);
+    //
+    private void EspiarAlimentosAmigos() {
+        //obtem lista amigo
+        ArrayAdapter adapter = new ArrayAdapter(this, R.layout.list_item, ObterAlimentosAmigosParaEspiar());
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Espiar Alimentos");
+        builder.setSingleChoiceItems(adapter, 0, new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+                //Toast.makeText(MainActivity.this, "posição selecionada=" + arg1, Toast.LENGTH_SHORT).show();
+                alerta.dismiss();
             }
+        });
+
+        alerta = builder.create();
+        alerta.show();
+
+
     }
 
-    private class AmigosAdapter extends ArrayAdapter{
-        public AmigosAdapter(){
-            super(MainActivity.this, R.layout.list_item, amigos);
-        }
+//
+private class AlimentoAdapter extends ArrayAdapter {
+    public AlimentoAdapter() {
+        super(MainActivity.this, R.layout.list_item, alimentos);
+    }
+}
+
+private class AmigosAdapter extends ArrayAdapter {
+    public AmigosAdapter() {
+        super(MainActivity.this, R.layout.list_item, amigos);
+    }
+}
+
+class NavItem {
+    String mTitle;
+    String mSubtitle;
+    int mIcon;
+
+    public NavItem(String title, String subtitle, int icon) {
+        mTitle = title;
+        mSubtitle = subtitle;
+        mIcon = icon;
+    }
+}
+
+class DrawerListAdapter extends BaseAdapter {
+    Context mContext;
+    ArrayList<NavItem> mNavItems;
+
+    public DrawerListAdapter(Context context, ArrayList<NavItem> navItems) {
+        mContext = context;
+        mNavItems = navItems;
     }
 
-    class NavItem {
-        String mTitle;
-        String mSubtitle;
-        int mIcon;
-
-        public NavItem(String title, String subtitle, int icon){
-            mTitle = title;
-            mSubtitle = subtitle;
-            mIcon = icon;
-        }
+    @Override
+    public int getCount() {
+        return mNavItems.size();
     }
 
-    class DrawerListAdapter extends BaseAdapter{
-        Context mContext;
-        ArrayList<NavItem> mNavItems;
-
-        public DrawerListAdapter(Context context, ArrayList<NavItem> navItems){
-            mContext = context;
-            mNavItems = navItems;
-        }
-
-        @Override
-        public int getCount() {
-            return mNavItems.size();
-        }
-
-        @Override
-        public Object getItem(int position) {
-            return mNavItems.get(position);
-        }
-
-        @Override
-        public long getItemId(int position) {
-            return 0;
-        }
-
-        @Override
-        public View getView(int position, View convertView, ViewGroup parent) {
-            View view;
-
-            if (convertView == null) {
-                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-                view = inflater.inflate(R.layout.drawer_item, null);
-            }
-            else {
-                view = convertView;
-            }
-
-            TextView titleView = (TextView) view.findViewById(R.id.title);
-            TextView subtitleView = (TextView) view.findViewById(R.id.subTitle);
-            ImageView iconView = (ImageView) view.findViewById(R.id.icon);
-
-            titleView.setText( mNavItems.get(position).mTitle );
-            subtitleView.setText( mNavItems.get(position).mSubtitle );
-            iconView.setImageResource(mNavItems.get(position).mIcon);
-
-
-
-            return view;
-        }
+    @Override
+    public Object getItem(int position) {
+        return mNavItems.get(position);
     }
+
+    @Override
+    public long getItemId(int position) {
+        return 0;
+    }
+
+    @Override
+    public View getView(int position, View convertView, ViewGroup parent) {
+        View view;
+
+        if (convertView == null) {
+            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            view = inflater.inflate(R.layout.drawer_item, null);
+        } else {
+            view = convertView;
+        }
+
+        TextView titleView = (TextView) view.findViewById(R.id.title);
+        TextView subtitleView = (TextView) view.findViewById(R.id.subTitle);
+        ImageView iconView = (ImageView) view.findViewById(R.id.icon);
+
+        titleView.setText(mNavItems.get(position).mTitle);
+        subtitleView.setText(mNavItems.get(position).mSubtitle);
+        iconView.setImageResource(mNavItems.get(position).mIcon);
+
+
+        return view;
+    }
+
+}
 
     @Override
     public void onBackPressed() {
@@ -630,7 +680,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        switch(v.getId()) {
+        switch (v.getId()) {
 
             case R.id.idBtnSalvar:
 
@@ -639,11 +689,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 break;
 
             case R.id.idBtnSalvarLista:
-                Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
                 String idUsuario = ObterIdUsuario();
-                if(!idUsuario.equals("Inexistente")){
-                    SalvarListaParse(idUsuario,SalvarListaOffline(false),true);
-                }else {
+                if (!idUsuario.equals("Inexistente")) {
+                    SalvarListaParse(idUsuario, SalvarListaOffline(false), true);
+                } else {
                     SalvarListaOffline(true);
                 }
                 break;
@@ -668,12 +718,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             case R.id.idBtnObterListaAmigo:
 
-                if(amigoSelecionado != null) {
-                    Toast.makeText(getApplicationContext(),"Aguarde...",Toast.LENGTH_SHORT).show();
-                    if(VerificarConexao()) {
+                if (amigoSelecionado != null) {
+                    Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
+                    if (VerificarConexao()) {
                         ObterAlimentosAmigos();
-                    }else{
-                        Toast.makeText(getApplicationContext(),"Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(getApplicationContext(), "Não há conexão com a internet.", Toast.LENGTH_SHORT).show();
                     }
                 }
                 break;
@@ -704,13 +754,13 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         final Intent cadastroActivity = new Intent(this, CadastroUsuarioActivity.class);
 
         String idUsuarioLogado = ObterIdUsuario();
-        txtViewUsuario = (TextView)findViewById(R.id.idTxtViewNomeUsuarioDrawer);
+        txtViewUsuario = (TextView) findViewById(R.id.idTxtViewNomeUsuarioDrawer);
         txtViewUsuario.setText(ObterNomeUsuario(idUsuarioLogado));
-        txtViewIdUsuario = (TextView)findViewById(R.id.idTxtViewUserIDDrawer);
+        txtViewIdUsuario = (TextView) findViewById(R.id.idTxtViewUserIDDrawer);
         txtViewIdUsuario.setText(idUsuarioLogado);
 
 
-       Toolbar toolbar = (Toolbar)findViewById(R.id.idToolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.idToolbar);
         mDrawerLayout = (DrawerLayout) findViewById(R.id.idDrawerLayout);
 
         setSupportActionBar(toolbar);
@@ -720,14 +770,14 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
 
         mDrawerToggle = new ActionBarDrawerToggle(this,
-                mDrawerLayout,toolbar,
+                mDrawerLayout, toolbar,
                 R.string.drawer_open_content_desc,
                 R.string.drawer_close_content_desc);
 
         mNavItems.add(new NavItem("Lista de Alimentos", "Ver minha lista de alimentos", R.drawable.ic_action_view_as_list));
-        if(idUsuarioLogado.equals("Inexistente")) {
+        if (idUsuarioLogado.equals("Inexistente")) {
             mNavItems.add(new NavItem("Login", "Realizar login da conta", R.drawable.ic_action_person));
-        }else {
+        } else {
             mNavItems.add(new NavItem("Adicionar Amigo", "Adicionar Amigo à lista de amigos", R.drawable.ic_action_add_person));
             mNavItems.add(new NavItem("Lista de Amigos", "Ver minha lista de amigos", R.drawable.ic_action_group));
             mNavItems.add(new NavItem("Logout", "Realizar logout da conta", R.drawable.ic_action_undo));
@@ -737,7 +787,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         mDrawerList.setAdapter(drawerListAdapter);
 
-        TabHost tab = (TabHost)findViewById(R.id.tabHost);
+        TabHost tab = (TabHost) findViewById(R.id.tabHost);
         tab.setup();
 
         TabHost.TabSpec descritor = tab.newTabSpec("aba1");
@@ -756,28 +806,27 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         descritor.setIndicator("Área do Usuário");
         tab.addTab(descritor);
 
-        rdoBtnKg = (RadioButton)findViewById(R.id.rdoBtnKg);
-        rdoBtnG = (RadioButton)findViewById(R.id.rdoBtnG);
-        rdoBtnLitro = (RadioButton)findViewById(R.id.rdoBtnLitro);
-        rdoBtnUnidade = (RadioButton)findViewById(R.id.rdoBtnUnidade);
+        rdoBtnKg = (RadioButton) findViewById(R.id.rdoBtnKg);
+        rdoBtnG = (RadioButton) findViewById(R.id.rdoBtnG);
+        rdoBtnLitro = (RadioButton) findViewById(R.id.rdoBtnLitro);
+        rdoBtnUnidade = (RadioButton) findViewById(R.id.rdoBtnUnidade);
 
-        rdoGroupModal = (RadioGroup)findViewById(R.id.idRdoGroupModal);
+        rdoGroupModal = (RadioGroup) findViewById(R.id.idRdoGroupModal);
         rdoGroupModal.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if(checkedId == R.id.rdoBtnKg){
+                if (checkedId == R.id.rdoBtnKg) {
                     tipo = "Kilo(s)";
-                }else if(checkedId == R.id.rdoBtnG){
+                } else if (checkedId == R.id.rdoBtnG) {
                     tipo = "Grama(s)";
-                }else if(checkedId == R.id.rdoBtnLitro){
+                } else if (checkedId == R.id.rdoBtnLitro) {
                     tipo = "Litro(s)";
-                }else{
+                } else {
                     tipo = "Unidade(s)";
                 }
 
             }
         });
-
 
 
         final SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
@@ -789,7 +838,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         RecuperarListaDoJson();
         RecuperarListaDeAmigosJson();
 
-        lista = (ListView)findViewById(R.id.idListViewAlimentos);
+        lista = (ListView) findViewById(R.id.idListViewAlimentos);
         lista.setSelector(R.drawable.selected);
         adapter = new AlimentoAdapter();
         lista.setAdapter(adapter);
@@ -797,8 +846,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         //Teste da lista de Amigos//
 
 
-
-        final ListView listaDeAmigos = (ListView)findViewById(R.id.idListViewAmigos);
+        final ListView listaDeAmigos = (ListView) findViewById(R.id.idListViewAmigos);
         listaDeAmigos.setSelector(R.drawable.selected);
         adapterAmigos = new AmigosAdapter();
         listaDeAmigos.setAdapter(adapterAmigos);
@@ -828,29 +876,38 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         });
 
+        listaDeAmigos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
+            @Override
+            public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
+                amigoSelecionado = (Usuario) parent.getItemAtPosition(position);
+                EspiarAlimentosAmigos();
+                return false;
+            }
+        });
+
 
         botaosalvarAlimento = (Button) findViewById(R.id.idBtnSalvar);
         botaosalvarAlimento.setOnClickListener(this);
 
-        botaoMenos = (Button)findViewById(R.id.idBtnMinus);
+        botaoMenos = (Button) findViewById(R.id.idBtnMinus);
         botaoMenos.setOnClickListener(this);
 
-        botaoMais = (Button)findViewById(R.id.idBtnPlus);
+        botaoMais = (Button) findViewById(R.id.idBtnPlus);
         botaoMais.setOnClickListener(this);
 
-        botaoExcluir = (Button)findViewById(R.id.idBtnExclude);
+        botaoExcluir = (Button) findViewById(R.id.idBtnExclude);
         botaoExcluir.setOnClickListener(this);
 
-        botaoSalvarLista = (Button)findViewById(R.id.idBtnSalvarLista);
+        botaoSalvarLista = (Button) findViewById(R.id.idBtnSalvarLista);
         botaoSalvarLista.setOnClickListener(this);
 
-        botaoObterListaAmigo = (Button)findViewById(R.id.idBtnObterListaAmigo);
+        botaoObterListaAmigo = (Button) findViewById(R.id.idBtnObterListaAmigo);
         botaoObterListaAmigo.setOnClickListener(this);
 
-        botaoCadastrarUsuario = (Button)findViewById(R.id.idBtnCadastroUsuario);
+        botaoCadastrarUsuario = (Button) findViewById(R.id.idBtnCadastroUsuario);
         botaoCadastrarUsuario.setOnClickListener(this);
 
-        botaoExcluirAmigo = (Button)findViewById(R.id.idBtnExcluirAmigo);
+        botaoExcluirAmigo = (Button) findViewById(R.id.idBtnExcluirAmigo);
         botaoExcluirAmigo.setOnClickListener(this);
 
         tab.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
@@ -971,10 +1028,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         });
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            TabHost tab = (TabHost)findViewById(R.id.tabHost);
+            TabHost tab = (TabHost) findViewById(R.id.tabHost);
+
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                switch(position){
+                switch (position) {
                     case 0:
                         tab.setCurrentTab(0);
                         mDrawerLayout.closeDrawers();
@@ -1017,8 +1075,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         /*if (id == R.id.action_settings) {
             return true;
         }*/
-        switch(id){
-            case android.R.id.home:{
+        switch (id) {
+            case android.R.id.home: {
                 //aparece e desaparece o menu
 
                 return true;
