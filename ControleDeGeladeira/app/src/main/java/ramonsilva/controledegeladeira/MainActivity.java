@@ -48,9 +48,11 @@ import com.parse.ParseQuery;
 import android.os.Handler;
 import android.support.v7.widget.Toolbar;
 
-
 public class MainActivity extends ActionBarActivity implements View.OnClickListener {
 
+    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
+    ListView mDrawerList = null;
+    ActionBarDrawerToggle mDrawerToggle;
     private List<Alimentos> alimentos = new ArrayList<Alimentos>();
     private List<Alimentos> alimentosAmigos = new ArrayList<Alimentos>();
     private AlimentoAdapter adapter = null;
@@ -86,11 +88,18 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private TextView txtViewUsuario = null;
     private TextView txtViewIdUsuario = null;
     private DrawerLayout mDrawerLayout = null;
-    ArrayList<NavItem> mNavItems = new ArrayList<NavItem>();
-    ListView mDrawerList = null;
-    ActionBarDrawerToggle mDrawerToggle;
     private AlertDialog alerta;
 
+    protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
+        JSONArray ListaAlimentosObtidos = null;//
+        ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
+        queryListaAlimento.whereEqualTo("objectId", idListaUsuario);
+        List<ParseObject> objLista = queryListaAlimento.find();
+        for (ParseObject obj : objLista) {
+            ListaAlimentosObtidos = new JSONArray((String) obj.get("Alimentos"));
+        }
+        return ListaAlimentosObtidos;
+    }
 
     private boolean VerificarConexao() {
         boolean conectado = false;
@@ -104,17 +113,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         }
         return conectado;
-    }
-
-    protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
-        JSONArray ListaAlimentosObtidos = null;//
-        ParseQuery<ParseObject> queryListaAlimento = ParseQuery.getQuery("ListaDeAlimentos");
-        queryListaAlimento.whereEqualTo("objectId", idListaUsuario);
-        List<ParseObject> objLista = queryListaAlimento.find();
-        for (ParseObject obj : objLista) {
-            ListaAlimentosObtidos = new JSONArray((String) obj.get("Alimentos"));
-        }
-        return ListaAlimentosObtidos;
     }
 
     protected void SalvarLista(final boolean mostraMsg) {
@@ -407,12 +405,12 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-    }else{
+        } else {
             alimentosAmigos.clear();
         }
 
         return alimentosAmigos;
-}
+    }
 
     protected void RecuperarListaDoJson() {
         try {
@@ -579,6 +577,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         adapter.clear();
 
     }
+
     //
     private void EspiarAlimentosAmigos() {
         //obtem lista amigo
@@ -598,80 +597,17 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-//
-private class AlimentoAdapter extends ArrayAdapter {
-    public AlimentoAdapter() {
-        super(MainActivity.this, R.layout.list_item, alimentos);
-    }
-}
 
-private class AmigosAdapter extends ArrayAdapter {
-    public AmigosAdapter() {
-        super(MainActivity.this, R.layout.list_item, amigos);
-    }
-}
+    //TODO: Encontrar uma forma de gerar o sal, para a chave e armazena-lo. Ele pode ser publico
+    /*
+    private void EncriptarSenha(){
 
-class NavItem {
-    String mTitle;
-    String mSubtitle;
-    int mIcon;
-
-    public NavItem(String title, String subtitle, int icon) {
-        mTitle = title;
-        mSubtitle = subtitle;
-        mIcon = icon;
-    }
-}
-
-class DrawerListAdapter extends BaseAdapter {
-    Context mContext;
-    ArrayList<NavItem> mNavItems;
-
-    public DrawerListAdapter(Context context, ArrayList<NavItem> navItems) {
-        mContext = context;
-        mNavItems = navItems;
     }
 
-    @Override
-    public int getCount() {
-        return mNavItems.size();
+    private void DesencriptarSenha(){
+
     }
-
-    @Override
-    public Object getItem(int position) {
-        return mNavItems.get(position);
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return 0;
-    }
-
-    @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-        View view;
-
-        if (convertView == null) {
-            LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            view = inflater.inflate(R.layout.drawer_item, null);
-        } else {
-            view = convertView;
-        }
-
-        TextView titleView = (TextView) view.findViewById(R.id.title);
-        TextView subtitleView = (TextView) view.findViewById(R.id.subTitle);
-        ImageView iconView = (ImageView) view.findViewById(R.id.icon);
-
-        titleView.setText(mNavItems.get(position).mTitle);
-        subtitleView.setText(mNavItems.get(position).mSubtitle);
-        iconView.setImageResource(mNavItems.get(position).mIcon);
-
-
-        return view;
-    }
-
-}
-
+    */
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -961,29 +897,6 @@ class DrawerListAdapter extends BaseAdapter {
 
         botaoMenos.setOnTouchListener(new View.OnTouchListener() {
             private Handler mHandler;
-
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-
-                switch (event.getAction()) {
-                    case MotionEvent.ACTION_DOWN:
-                        if (mHandler != null)
-                            return true;
-                        mHandler = new Handler();
-                        mHandler.postDelayed(mAction, 300);
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        if (mHandler == null)
-                            return true;
-                        mHandler.removeCallbacks(mAction);
-                        mHandler = null;
-                        break;
-                }
-
-                return false;
-            }
-
             Runnable mAction = new Runnable() {
                 @Override
                 public void run() {
@@ -991,13 +904,10 @@ class DrawerListAdapter extends BaseAdapter {
                     mHandler.postDelayed(this, 300);
                 }
             };
-        });
-
-        botaoMais.setOnTouchListener(new View.OnTouchListener() {
-            private Handler mHandler;
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
+
                 switch (event.getAction()) {
                     case MotionEvent.ACTION_DOWN:
                         if (mHandler != null)
@@ -1005,6 +915,7 @@ class DrawerListAdapter extends BaseAdapter {
                         mHandler = new Handler();
                         mHandler.postDelayed(mAction, 300);
                         break;
+
                     case MotionEvent.ACTION_UP:
                         if (mHandler == null)
                             return true;
@@ -1015,7 +926,10 @@ class DrawerListAdapter extends BaseAdapter {
 
                 return false;
             }
+        });
 
+        botaoMais.setOnTouchListener(new View.OnTouchListener() {
+            private Handler mHandler;
             Runnable mAction = new Runnable() {
                 @Override
                 public void run() {
@@ -1025,6 +939,26 @@ class DrawerListAdapter extends BaseAdapter {
 
                 ;
             };
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN:
+                        if (mHandler != null)
+                            return true;
+                        mHandler = new Handler();
+                        mHandler.postDelayed(mAction, 300);
+                        break;
+                    case MotionEvent.ACTION_UP:
+                        if (mHandler == null)
+                            return true;
+                        mHandler.removeCallbacks(mAction);
+                        mHandler = null;
+                        break;
+                }
+
+                return false;
+            }
         });
 
         mDrawerList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -1103,6 +1037,80 @@ class DrawerListAdapter extends BaseAdapter {
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+
+    //
+    private class AlimentoAdapter extends ArrayAdapter {
+        public AlimentoAdapter() {
+            super(MainActivity.this, R.layout.list_item, alimentos);
+        }
+    }
+
+    private class AmigosAdapter extends ArrayAdapter {
+        public AmigosAdapter() {
+            super(MainActivity.this, R.layout.list_item, amigos);
+        }
+    }
+
+    class NavItem {
+        String mTitle;
+        String mSubtitle;
+        int mIcon;
+
+        public NavItem(String title, String subtitle, int icon) {
+            mTitle = title;
+            mSubtitle = subtitle;
+            mIcon = icon;
+        }
+    }
+
+    class DrawerListAdapter extends BaseAdapter {
+        Context mContext;
+        ArrayList<NavItem> mNavItems;
+
+        public DrawerListAdapter(Context context, ArrayList<NavItem> navItems) {
+            mContext = context;
+            mNavItems = navItems;
+        }
+
+        @Override
+        public int getCount() {
+            return mNavItems.size();
+        }
+
+        @Override
+        public Object getItem(int position) {
+            return mNavItems.get(position);
+        }
+
+        @Override
+        public long getItemId(int position) {
+            return 0;
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            View view;
+
+            if (convertView == null) {
+                LayoutInflater inflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                view = inflater.inflate(R.layout.drawer_item, null);
+            } else {
+                view = convertView;
+            }
+
+            TextView titleView = (TextView) view.findViewById(R.id.title);
+            TextView subtitleView = (TextView) view.findViewById(R.id.subTitle);
+            ImageView iconView = (ImageView) view.findViewById(R.id.icon);
+
+            titleView.setText(mNavItems.get(position).mTitle);
+            subtitleView.setText(mNavItems.get(position).mSubtitle);
+            iconView.setImageResource(mNavItems.get(position).mIcon);
+
+
+            return view;
+        }
+
     }
 }
 

@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.os.AsyncTask;
+import android.os.Handler;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.support.v7.app.AlertDialog;
@@ -33,7 +34,6 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import android.os.Handler;
 
 public class CadastroUsuarioActivity extends ActionBarActivity implements View.OnClickListener {
 
@@ -161,8 +161,12 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
             } catch (ParseException p) {//nao encontrou usuario cadastra-lo
                 p.printStackTrace();
                 ParseObject usuarioCadastrar = new ParseObject("Usuario");
-                usuarioCadastrar.put("nome", nome);
-                usuarioCadastrar.put("senha", senha);
+                try {
+                    usuarioCadastrar.put("nome", nome);
+                    usuarioCadastrar.put("senha", HashUtils.generateSHA1(senha+nome));
+                }catch(Exception e){
+                    e.printStackTrace();
+                }
                 try {//implementar o cadastro
                     usuarioCadastrar.save();
                     //Toast.makeText(getApplicationContext(), "Usuário cadastrado com sucesso ;)", Toast.LENGTH_SHORT).show();
@@ -267,8 +271,12 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
             Intent i = new Intent(getApplicationContext(), MainActivity.class);
             ParseQuery<ParseObject> queryLogin = ParseQuery.getQuery("Usuario");
+        try {
             queryLogin.whereEqualTo("nome", nome);
-            queryLogin.whereEqualTo("senha", senha);
+            queryLogin.whereEqualTo("senha", HashUtils.generateSHA1(senha+nome));
+        }catch(Exception e){
+            e.printStackTrace();
+        }
             List<ParseObject> objUsuario = null;
             try {
                 objUsuario = queryLogin.find();
@@ -316,6 +324,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
         }
         return conectado;
     }
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -415,6 +424,13 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
     @Override
     public void onClick(View v) {
+
+        runOnUiThread(new Runnable() {
+            public void run() {
+
+                Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
+            }
+        });
 
         switch (v.getId()) {
             case R.id.idBtnVoltar:
