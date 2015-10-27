@@ -574,6 +574,11 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         prefEditorListaUsuario.clear();
         prefEditorListaUsuario.commit();
 
+        SharedPreferences listaAmigosPref = getSharedPreferences("ListaAmigos", Context.MODE_PRIVATE);
+        SharedPreferences.Editor prefEditorListaAmigos = listaAmigosPref.edit();
+        prefEditorListaAmigos.clear();
+        prefEditorListaAmigos.commit();
+
         adapter.clear();
 
     }
@@ -597,17 +602,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-
-    //TODO: Encontrar uma forma de gerar o sal, para a chave e armazena-lo. Ele pode ser publico
-    /*
-    private void EncriptarSenha(){
-
-    }
-
-    private void DesencriptarSenha(){
-
-    }
-    */
     @Override
     public void onBackPressed() {
         super.onBackPressed();

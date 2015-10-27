@@ -197,7 +197,8 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                 listaDeUsuarios = new ArrayList<Usuario>();
             }
             if (!VerificarSeAmigoEstaCadastrado(listaDeUsuarios, nome)) {
-                listaDeUsuarios.add(usuario);
+               //Remover daqui, so adicionar se o usuario for adicionado no parse
+
                 ParseQuery<ParseObject> queryAmigo = ParseQuery.getQuery("Usuario");
                 queryAmigo.whereEqualTo("nome", nome);
                 queryAmigo.whereEqualTo("objectId", senha);
@@ -208,7 +209,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
                     JSONArray array = new JSONArray();
                     JSONObject obj;
-
+                    listaDeUsuarios.add(usuario);
                     for (Usuario usuario : listaDeUsuarios) {
                         obj = new JSONObject();
                         try {
@@ -232,6 +233,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                             listaDeAmigos.save();
                             prefsEditorListaAmigos.putString("idListaAmigo", listaDeAmigos.getObjectId());
                             prefsEditorListaAmigos.commit();
+
                             Toast.makeText(getApplicationContext(), "Amigo adicionado com sucesso", Toast.LENGTH_SHORT).show();
                             PassarParametroEiniciarActivity(i);
 
@@ -243,7 +245,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
 
                         String idListaAmigo = idListaAmigos.getString("idListaAmigo", "Inexistente");//TODO: Melhorar a forma de verificação, utiliza 2x a msm função
                         ParseQuery<ParseObject> queryAmigoUpdate = ParseQuery.getQuery("ListaDeAmigos");
-                        ParseObject listaDeamigos = queryAmigoUpdate.getFirst();
+                        ParseObject listaDeamigos = queryAmigoUpdate.get(idListaAmigo);
                         listaDeamigos.put("Dados", arrayStr);
                         try {
                             listaDeamigos.save();
@@ -445,7 +447,7 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                 break;
 
             case R.id.idBtnSalvarUsuario:
-                Toast.makeText(getApplicationContext(), "aguarde...", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(getApplicationContext(), "aguarde...", Toast.LENGTH_SHORT).show();
                 EditText txtNome = (EditText) findViewById(R.id.idEditTextNomeUsuario);
                 EditText txtSenha = (EditText) findViewById(R.id.idEditTextSenhaUsuario);
                 nome = txtNome.getText().toString();
@@ -462,13 +464,12 @@ public class CadastroUsuarioActivity extends ActionBarActivity implements View.O
                         txtNome.setText("");
                         txtSenha.setText("");
                     } else {
-                        mensagem = "Não há conexão com a internet";
+                        Toast.makeText(getApplicationContext(), "Não há conexão com a internet", Toast.LENGTH_LONG).show();
                     }
 
                 }else{
-                    mensagem = "Os campos devem ser preenchidos";
+                    Toast.makeText(getApplicationContext(), "Os campos devem ser preenchidos", Toast.LENGTH_LONG).show();
                 }
-                Toast.makeText(getApplicationContext(), mensagem, Toast.LENGTH_LONG).show();
 
                 break;
 
