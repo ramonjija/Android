@@ -71,7 +71,9 @@
                             android:background="@android:color/transparent"
                             android:clickable="true"
                             android:layout_weight="0.56"
-                            android:headerDividersEnabled="true" />
+                            android:headerDividersEnabled="true"
+                            android:drawSelectorOnTop="false"
+                            android:footerDividersEnabled="false" />
 
                     </LinearLayout>
 

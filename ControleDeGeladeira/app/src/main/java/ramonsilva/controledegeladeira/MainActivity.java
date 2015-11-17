@@ -583,7 +583,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
-    //
     private void EspiarAlimentosAmigos() {
         //obtem lista amigo
         ArrayAdapter adapter = new ArrayAdapter(this, R.layout.list_item, ObterAlimentosAmigosParaEspiar());
@@ -982,6 +981,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             }
         });
+
 
     }
 
