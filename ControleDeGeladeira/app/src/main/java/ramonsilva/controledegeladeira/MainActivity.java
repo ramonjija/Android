@@ -25,6 +25,7 @@ import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -89,6 +90,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private TextView txtViewIdUsuario = null;
     private DrawerLayout mDrawerLayout = null;
     private AlertDialog alerta;
+    private TabHost tab;
 
     protected static JSONArray ObtemListaAlimentosUsuario(String idListaUsuario) throws ParseException, JSONException {
         JSONArray ListaAlimentosObtidos = null;//
@@ -601,6 +603,51 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
     }
 
+    private void EspiarESelecionarAlimentosAmigos(){
+        final List<Alimentos> listaDeALimentosObtida = ObterAlimentosAmigosParaEspiar();
+        CharSequence[] charSequences = new CharSequence[listaDeALimentosObtida.size()];
+        int i = 0;
+       for(Alimentos alimento : listaDeALimentosObtida){
+           charSequences[i] = alimento.toString();
+           i++;
+       }
+        final boolean[] checados = new boolean[charSequences.length];
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Espiar Alimentos");
+        builder.setMultiChoiceItems(charSequences, checados, new DialogInterface.OnMultiChoiceClickListener() {
+            public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
+                checados[arg1] = arg2;
+            }
+        });
+        builder.setPositiveButton("Inserir", new DialogInterface.OnClickListener() {
+            public void onClick(DialogInterface arg0, int arg1) {
+                StringBuilder texto = new StringBuilder("Inseridos: ");
+                int i = 0;
+                for (boolean ch : checados) {
+
+                    //Inserir os alimentos aqui!
+                    if (ch) {
+                        Alimentos alimento = listaDeALimentosObtida.get(i);
+                        adapter.add(alimento);
+                        texto.append(alimento.getNome().toString()).append(", ");
+                    }
+                    i++;
+                }
+                texto.delete(texto.length() - 2, texto.length()).append(".");
+                //Dizer que foram inseridos!
+                Toast.makeText(MainActivity.this, texto.toString(), Toast.LENGTH_SHORT).show();
+                tab.setCurrentTab(0);
+            }
+        });
+        alerta = builder.create();
+        alerta.show();
+
+        //Volta para a tab de lista de alimentos inicial para salvar!
+
+
+    }
+
     @Override
     public void onBackPressed() {
         super.onBackPressed();
@@ -716,7 +763,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         mDrawerList.setAdapter(drawerListAdapter);
 
-        TabHost tab = (TabHost) findViewById(R.id.tabHost);
+        //TabHost tab = (TabHost) findViewById(R.id.tabHost); ACABEI DE MUDAR
+        tab = (TabHost) findViewById(R.id.tabHost);
         tab.setup();
 
         TabHost.TabSpec descritor = tab.newTabSpec("aba1");
@@ -757,10 +805,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             }
         });
 
-
         final SharedPreferences mPrefs = getPreferences(MODE_PRIVATE);
-
-
         contexto = getApplicationContext();
 
         ChecarUsuarioCadastrado();
@@ -804,15 +849,32 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             }
         });
+        listaDeAmigos.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
+            @Override
+            public void onSwipeRight() {
+                tab.setCurrentTab(1);
+            }
+        });
 
         listaDeAmigos.setOnItemLongClickListener(new AdapterView.OnItemLongClickListener() {
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 amigoSelecionado = (Usuario) parent.getItemAtPosition(position);
-                EspiarAlimentosAmigos();
+                //EspiarAlimentosAmigos();
+                EspiarESelecionarAlimentosAmigos();
                 return false;
             }
         });
+        //Navegação em Swype
+        lista.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
+            @Override
+            public void onSwipeLeft() {
+               tab.setCurrentTab(1);
+            }
+        });
+
+
+
 
 
         botaosalvarAlimento = (Button) findViewById(R.id.idBtnSalvar);
@@ -863,7 +925,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                                                 botaoCadastrarUsuario.setVisibility(View.INVISIBLE);
                                                 botaosalvarAlimento.setVisibility(View.VISIBLE);
                                                 botaoExcluirAmigo.setVisibility(View.INVISIBLE);
-
                                             }
                                             if (tabId.equals("aba3")) {
 
@@ -1032,6 +1093,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         super.onConfigurationChanged(newConfig);
         mDrawerToggle.onConfigurationChanged(newConfig);
     }
+
 
     //
     private class AlimentoAdapter extends ArrayAdapter {
