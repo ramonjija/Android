@@ -29,6 +29,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
 import android.widget.TabHost;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -89,6 +90,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
     private TextView txtViewUsuario = null;
     private TextView txtViewIdUsuario = null;
     private DrawerLayout mDrawerLayout = null;
+    private RelativeLayout layoutCadastroAlimento = null;
     private AlertDialog alerta;
     private TabHost tab;
 
@@ -613,7 +615,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
        }
         final boolean[] checados = new boolean[charSequences.length];
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        final AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Espiar Alimentos");
         builder.setMultiChoiceItems(charSequences, checados, new DialogInterface.OnMultiChoiceClickListener() {
             public void onClick(DialogInterface arg0, int arg1, boolean arg2) {
@@ -636,8 +638,10 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 }
                 texto.delete(texto.length() - 2, texto.length()).append(".");
                 //Dizer que foram inseridos!
-                Toast.makeText(MainActivity.this, texto.toString(), Toast.LENGTH_SHORT).show();
-                tab.setCurrentTab(0);
+                if(!texto.toString().equals("Inseridos.")){
+                    Toast.makeText(MainActivity.this, texto.toString(), Toast.LENGTH_SHORT).show();
+                    tab.setCurrentTab(0);
+                }
             }
         });
         alerta = builder.create();
@@ -665,13 +669,25 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 break;
 
             case R.id.idBtnSalvarLista:
+                Handler handler = new Handler();
+                botaoSalvarLista.setEnabled(false);
                 Toast.makeText(getApplicationContext(), "Aguarde...", Toast.LENGTH_SHORT).show();
-                String idUsuario = ObterIdUsuario();
-                if (!idUsuario.equals("Inexistente")) {
-                    SalvarListaParse(idUsuario, SalvarListaOffline(false), true);
-                } else {
-                    SalvarListaOffline(true);
-                }
+                handler.postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        String idUsuario = ObterIdUsuario();
+                        if (!idUsuario.equals("Inexistente")) {
+                            SalvarListaParse(idUsuario, SalvarListaOffline(false), true);
+                            botaoSalvarLista.setEnabled(true);
+
+                        } else {
+                            SalvarListaOffline(true);
+                            botaoSalvarLista.setEnabled(true);
+
+                        }
+                    }
+                }, 250);
+
                 break;
 
             case R.id.idBtnMinus:
@@ -687,7 +703,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 break;
 
             case R.id.idBtnExclude:
-
+                botaoExcluir.setEnabled(false);
                 ExcluirAlimentoLista();
 
                 break;
@@ -763,7 +779,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         mDrawerList.setAdapter(drawerListAdapter);
 
-        //TabHost tab = (TabHost) findViewById(R.id.tabHost); ACABEI DE MUDAR
         tab = (TabHost) findViewById(R.id.tabHost);
         tab.setup();
 
@@ -774,7 +789,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         descritor = tab.newTabSpec("aba2");
         descritor.setContent(R.id.Cadastro);
-        //descritor.setIndicator(getString(R.string.cadastro));
         descritor.setIndicator("Adicionar Alimento");
         tab.addTab(descritor);
 
@@ -817,9 +831,6 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         adapter = new AlimentoAdapter();
         lista.setAdapter(adapter);
 
-        //Teste da lista de Amigos//
-
-
         final ListView listaDeAmigos = (ListView) findViewById(R.id.idListViewAmigos);
         listaDeAmigos.setSelector(R.drawable.selected);
         adapterAmigos = new AmigosAdapter();
@@ -835,6 +846,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 viewAl = view;
 
                 alimentoSelecionado = (Alimentos) parent.getItemAtPosition(posicaoDoALimento);
+                botaoExcluir.setEnabled(true);
 
             }
 
@@ -849,6 +861,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
             }
         });
+        //Navegação em Swype
         listaDeAmigos.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
             @Override
             public void onSwipeRight() {
@@ -860,7 +873,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
             @Override
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
                 amigoSelecionado = (Usuario) parent.getItemAtPosition(position);
-                //EspiarAlimentosAmigos();
+                //Espiar alimentos e obter multiplos
                 EspiarESelecionarAlimentosAmigos();
                 return false;
             }
@@ -869,12 +882,48 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
         lista.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()) {
             @Override
             public void onSwipeLeft() {
-               tab.setCurrentTab(1);
+                tab.setCurrentTab(1);
             }
         });
 
+        //Navegação em Swype
+        layoutCadastroAlimento = (RelativeLayout)findViewById(R.id.Cadastro);
+        layoutCadastroAlimento.setOnTouchListener(new OnSwipeTouchListener(getApplicationContext()){
+            final int MIN_DISTANCE = 100;// TODO change this runtime based on screen resolution. for 1920x1080 is to small the 100 distance
+            float downX = 0, upX = 0;
+
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                switch (event.getAction()) {
+                    case MotionEvent.ACTION_DOWN: {
+                        downX = event.getX();
+                        return true;
+                    }
+                    case MotionEvent.ACTION_UP: {
+                        upX = event.getX();
+
+                        float deltaX = downX - upX;
+                        if (Math.abs(deltaX) > MIN_DISTANCE) {
+                            if (deltaX < 0) {
+                                tab.setCurrentTab(0);
+                                return true;
+                            }
+                            if (deltaX > 0) {
+                                tab.setCurrentTab(2);
+                                return true;
+                            }
+                        } else {
+                            return false;
+                        }
+                        return false;
+                    }
+                }
+                return false;
 
 
+                //return super.onTouch(v, event);
+            }
+        });
 
 
         botaosalvarAlimento = (Button) findViewById(R.id.idBtnSalvar);
@@ -888,6 +937,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
 
         botaoExcluir = (Button) findViewById(R.id.idBtnExclude);
         botaoExcluir.setOnClickListener(this);
+        botaoExcluir.setEnabled(false);
 
         botaoSalvarLista = (Button) findViewById(R.id.idBtnSalvarLista);
         botaoSalvarLista.setOnClickListener(this);
@@ -955,7 +1005,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     AlterarQuantidade(-1);
-                    mHandler.postDelayed(this, 300);
+                    mHandler.postDelayed(this, 120);
                 }
             };
 
@@ -967,7 +1017,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         if (mHandler != null)
                             return true;
                         mHandler = new Handler();
-                        mHandler.postDelayed(mAction, 300);
+                        mHandler.postDelayed(mAction, 120);
                         break;
 
                     case MotionEvent.ACTION_UP:
@@ -988,10 +1038,8 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                 @Override
                 public void run() {
                     AlterarQuantidade(+1);
-                    mHandler.postDelayed(this, 300);
+                    mHandler.postDelayed(this, 120);
                 }
-
-                ;
             };
 
             @Override
@@ -1001,7 +1049,7 @@ public class MainActivity extends ActionBarActivity implements View.OnClickListe
                         if (mHandler != null)
                             return true;
                         mHandler = new Handler();
-                        mHandler.postDelayed(mAction, 300);
+                        mHandler.postDelayed(mAction, 120);
                         break;
                     case MotionEvent.ACTION_UP:
                         if (mHandler == null)
